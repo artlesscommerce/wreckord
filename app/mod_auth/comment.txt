@@ -1,0 +1,36 @@
+
+this module:
+
+1. adds new users to users1 table 
+
+2. checks users trying to login to users1 table details
+
+3* user can change password in users1 table
+
+4* every time a user successfully logs in a record is added to login1 table
+
+5. a user can log out and the session is cleared
+
+
+*todo
+
+
+table structures:
+
+CREATE TABLE `users1` (
+  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `loginName` varchar(25) NOT NULL,
+  `createDate` datetime NOT NULL,
+  `hashword` varchar(255) NOT NULL,
+  `thestyle` varchar(25) DEFAULT NULL,
+  `closeDate` datetime DEFAULT NULL,
+  PRIMARY KEY (`uniqueX`)
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `login1` (
+  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `loginName` varchar(25) NOT NULL,
+  `loginTime` datetime NOT NULL,
+  PRIMARY KEY (`uniqueX`)
+) ENGINE=MyISAM AUTO_INCREMENT=309 DEFAULT CHARSET=latin1;

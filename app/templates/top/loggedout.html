@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="{{ url_for('static',filename='style-dark.css') }}" rel="stylesheet">
+<link rel="icon" href="{{ url_for('static',filename='icon.png') }}">
+
+<title>
+now
+</title>
+
+<script>
+sitenamevar = '{{ sitename }} '; 
+
+mynewvar = function(e) {
+    var event = e || window.event;
+    var charCode = event.which || event.keyCode;
+
+    if ( charCode == '13' ) {
+      // Enter pressed
+	  console.log ( 'enter2!' );
+	  robotButton( )
+      return false;
+    }
+}
+
+function robotButton( mvar1 = 'blank' )
+{
+	console.log ( mvar1 );
+	
+	namevar = document.getElementById('username').value
+	pwvar = document.getElementById('secret').value
+	
+	var postVars = 'button=' + 'login' + '&username=' + namevar + '&secret=' + pwvar
+	console.log ( pwvar );
+	
+	request = new ajaxRequest()
+
+	request.open("POST", "{{ url_for('auth.signin') }}"  )
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+
+	request.onreadystatechange = function()
+	{
+		if (this.readyState == 4)
+		{
+		  if (this.status == 200)
+		  {
+			if (this.responseText != null)
+			{
+				console.log ( 'heynow' );
+				console.log( this.responseText )
+				if( this.responseText == "loggedin" )
+				{
+					window.location = "{{ url_for('index') }}" ;
+				}
+				else
+				{
+					document.getElementById('sitetitle').innerHTML = sitenamevar;
+					document.getElementById('contentpre').innerHTML = "bad password or username : " + this.responseText;
+				}
+			}
+			else alert("Ajax error: No data received")
+		  }
+		  else alert( "Ajax errorz: " + this.statusText)
+		}
+	}
+	
+	waitvar = "<img src=\"" + "{{ url_for('static',filename='loadinfo.gu.gif') }}" + "\">"
+
+	document.getElementById('sitetitle').innerHTML = sitenamevar + waitvar; //'wait'
+
+	request.send(postVars)
+}
+
+function ajaxRequest()
+{
+ try
+ {
+  var request = new XMLHttpRequest()
+ }
+ catch(e1)
+ {
+  try
+  {
+	request = new ActiveXObject("Msxml2.XMLHTTP")
+  }
+  catch(e2)
+  {
+	try
+	{
+	  request = new ActiveXObject("Microsoft.XMLHTTP")
+	}
+	catch(e3)
+	{
+	  request = false
+	}
+  }
+ }
+ return request
+}
+
+</script>
+</head>
+
+<body bgcolor="black">
+<div id="container">
+
+<div id="top">
+<h1>
+<a id="sitetitle" href="{{ url_for('index') }}">
+
+<script>
+document.write(sitenamevar);
+</script>
+
+</a></h1>
+</div>
+		
+<div id="leftnavpre">
+<center>
+<table>
+<tr class="blank"><td><center>
+login<br>
+<input type="text" id="username" name="namex" maxlength="25" size="10"><br>
+Password<br><input type="password" id="secret" name="passx" maxlength="25" size="10"><br>
+</center>
+</td></tr>
+<tr class="blank"><td><center>
+<button name="button100" id="foo" onclick="robotButton( );" >Send</button>
+</center>
+</td></tr>
+</table>
+<br><br>
+
+<a href="{{ url_for('auth.newuser') }}" >sign up</a>
+</center>
+</div>
+
+<div id="contentpre">
+
+	<p>
+	You are not logged in.
+	</p>
+
+</div>
+
+<div id="footer">
+	<div id="lbox">
+		mess
+	</div>
+	<div id="rbox">
+		<a href="{{ url_for('about') }}">2017</a>
+	</div>
+</div>
+</div>
+<script>
+	
+document.getElementById('secret').onkeypress = mynewvar
+document.getElementById('username').onkeypress = mynewvar
+
+</script>
+</body>
+
+</html>

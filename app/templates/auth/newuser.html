@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+<link href="{{ url_for('static',filename='style-dark.css') }}" rel="stylesheet">
+<title>
+new user
+</title>
+
+
+
+
+
+<script>
+sitenamevar = '{{ sitename }} '; 
+
+mynewvar = function(e) {
+    var event = e || window.event;
+    var charCode = event.which || event.keyCode;
+
+    if ( charCode == '13' ) {
+      // Enter pressed
+	  console.log ( 'enter2!' );
+	  robotButton( )
+      return false;
+    }
+}
+
+
+function robotButton2( mvar1 = "blank", mvar2 = "blank" )
+{
+	console.log ( 'sendaround' );
+	console.log ( mvar1 );
+	console.log ( document.getElementById('username').value );
+	console.log ( document.getElementById('secret').value );
+}
+
+
+
+function robotButton()
+{
+	namevar = document.getElementById('username').value
+	pwvar1 = document.getElementById('pwvar1').value
+	pwvar2 = document.getElementById('pwvar2').value
+	
+	var postVars = "jsvar1=" + namevar + "&jsvar2=" + pwvar1 + "&jsvar3=" + pwvar2
+	
+	request = new ajaxRequest()
+
+	request.open("POST", "{{ url_for('auth.newuser2') }}"  )
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+
+	request.onreadystatechange = function()
+	{
+		if (this.readyState == 4)
+		{
+		  if (this.status == 200)
+		  {
+			if (this.responseText != null)
+			{
+				console.log ( 'heynow' );
+				console.log( this.responseText )
+				
+				
+				editPage( this.responseText )
+			}
+			else alert("Ajax error: No data received")
+		  }
+		  else alert( "Ajax errorz: " + this.statusText)
+		}
+	}
+	
+	request.send(postVars)
+}
+
+function ajaxRequest()
+{
+ try
+ {
+  var request = new XMLHttpRequest()
+ }
+ catch(e1)
+ {
+  try
+  {
+	request = new ActiveXObject("Msxml2.XMLHTTP")
+  }
+  catch(e2)
+  {
+	try
+	{
+	  request = new ActiveXObject("Microsoft.XMLHTTP")
+	}
+	catch(e3)
+	{
+	  request = false
+	}
+  }
+ }
+ return request
+}
+
+
+
+function editPage( mvar2 )
+{
+	console.log ( "edit page" );
+	console.log ( mvar2 );
+
+//	document.getElementById('sitetitle').innerHTML = sitenamevar;
+	
+	
+	varr = JSON.parse( mvar2 )
+	
+	if( varr['newMessage'] != null )
+	{
+		console.log( 'hiihi' )
+		if( varr['newMessage'] == 'user added' )
+		{
+			document.getElementById('content2').innerHTML = '<br>' + varr['newMessage'] + '<br><br>'; 
+		}
+		else
+		{
+			document.getElementById('newMessage').innerHTML = '<br>' +varr['newMessage'] + '<br>';
+		}
+	}
+}
+
+</script>
+
+</head>
+
+<body><div id="container">
+
+<div id="top">
+<h1>
+
+<a id="sitetitle" href="{{ url_for('index') }}">
+
+<script>
+document.write(sitenamevar);
+</script>
+
+</a>
+
+</h1>
+
+
+</div>
+
+<div id="content2">
+<h2>Create a new user</h2>
+
+
+<center>
+<TABLE >
+<tr class="blank2"><td>user name</td><td><input id="username" type="text" name="namex" maxlength="25" value=""></td></tr>
+<tr class="blank2"><td>password</td><td><input id="pwvar1" type="password" name="pass1" maxlength="25"></td></tr>
+<tr class="blank2"><td>re-type password</td><td><input id="pwvar2" type="password" name="pass2" maxlength="25"></td></tr>
+<tr class="blank2"><td></td>
+
+
+<td>
+	<button name="button100" id="foo" onclick="robotButton( );" >Send</button>
+</td>
+</tr>
+
+</TABLE >
+
+
+</center>
+<div id="newMessage">
+</div>
+
+</div>
+
+<div id="footer">
+	<div id="lbox">
+		mess
+	</div>
+	<div id="rbox">
+		<a href="{{ url_for('about') }}">2017</a>
+	</div>
+</div>
+</div>
+
+<script>
+	
+document.getElementById('pwvar2').onkeypress = mynewvar
+
+</script>
+
+</body>
+</html>

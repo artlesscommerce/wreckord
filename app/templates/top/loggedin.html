@@ -1,0 +1,340 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+
+<link rel="icon" href="{{ url_for('static',filename='icon.png') }}">
+
+
+<link  href= "{{ mycssfile }}{{ random }}" rel="stylesheet">
+
+
+
+<title>
+now
+</title>
+
+<script>
+
+
+sitenamevar = '{{ sitename }} '; 
+
+settinsvar = '\
+<a href="{{ url_for('index') }}#changepass">change password</a><br>\
+<a href="{{ url_for('index') }}#cssfill">colour scheme</a><br>\
+<a href="{{ url_for('index') }}#closeuser">close user</a><br>'
+
+changepassvar = '<TABLE >\
+	<tr class="trq"><td>password</td><td><input  type="password" id="pass1" maxlength="25"></td></tr>\
+	<tr class="trq"><td>new pass</td><td><input  type="password" id="pass2a" maxlength="25"></td></tr>\
+	<tr class="trq"><td>new pass 2</td><td><input  type="password" id="pass2b" maxlength="25"></td></tr>\
+	<tr class="trq"><td></td><td>\
+<button onclick="robotButton( \'changePassButton\', ' + 'document.getElementById(\'pass1\').value, ' + 'document.getElementById(\'pass2a\').value, ' + 'document.getElementById(\'pass2b\').value ' + ' ) ;" >Send</button>\
+	</td></tr>\
+	</TABLE >'
+
+closeuservar1 = 'recall and delete all your products<br>\
+	send all other products back to who created them</a><br>\
+	no longer be able to log in as this user ?<br><br>\
+	<TABLE >\
+	<tr class="trq"><td>password</td></tr>\
+	<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
+	<tr class="trq"><td>'
+	
+
+closeuservar2 = '</td></tr></TABLE >'
+
+
+
+var times = null;
+
+
+
+function cssfill()
+{
+	var1 =  '<a onclick="robotButton( \'colours\',\'light\' ) ; return false;" href="">light</a><br>'
+	var1 +=  '<a onclick="robotButton( \'colours\',\'dark\' ) ; return false;" href="">dark</a><br>'
+	
+	document.getElementById('content').innerHTML = var1
+}
+
+
+miscHash = function(  )
+{
+	console.log('rzzl')
+	times = '';
+    if (location.hash.length > 0)
+    {
+        times = location.hash.replace('#','') ;
+    }
+    else
+    {
+		varLoggedIn = '<p><h2>hello</h2></p>'
+		document.getElementById('content').innerHTML = varLoggedIn
+		return 0 ;
+	}
+    
+	x = times.split("&*"); 
+	times = x[0]
+
+    if (times == 'settins' )
+    {
+		document.getElementById('content').innerHTML = settinsvar;
+		return 0 ;
+	}
+    if (times == 'okMessage' )
+    {
+		document.getElementById('content').innerHTML = newMessage;
+		newMessage = ''
+		return 0 ;
+	}
+    if (times == 'changepass' )
+    {
+		document.getElementById('content').innerHTML = changepassvar;
+		return 0 ;
+	}
+    if (times == 'cssfill' )
+    {
+		var1  =  '<div id="lightb">lite</div>'
+		var1 +=  '<div id="darkb">darc</div>'
+		
+		document.getElementById('content').innerHTML = var1
+		
+		myvarfunc1 = function()
+		{
+			robotButton( 'colours','light' ) 
+		}
+		myvarfunc2 = function()
+		{
+			robotButton( 'colours','dark' ) 
+		}
+		
+		var a = document.getElementById("lightb");
+		var b = document.getElementById("darkb");
+		a.onclick = myvarfunc1
+		b.onclick = myvarfunc2
+
+		return 0 ;
+	}
+    if (times == 'closeuser' )
+    {
+		document.getElementById('content').innerHTML = closeuservar1 + '<button onclick="robotButton( \'closeuserButton\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>' + closeuservar2;
+		return 0 ;
+	}
+
+	robotButton.apply(this, x);
+}
+
+window.onhashchange = miscHash
+window.onload       = miscHash
+
+
+function robotButton( mvar1 = '', mvar2 = '', mvar3 = '', mvar4 = '', mvar5 = '', mvar6 = '' )
+{
+	console.log ( 'robotButton', mvar1 );
+	
+	params  = "buttontype=" + mvar1 + "&jsvar1=" + mvar2 + "&jsvar2=" + mvar3 + "&jsvar3=" + mvar4 + "&jsvar4=" + mvar5 + "&jsvar5=" + mvar6;
+
+	request = new ajaxRequest()
+
+	request.open("POST", "{{ url_for('top.ajax') }}"  )
+	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
+	
+	request.onreadystatechange = function()
+	{
+		if (this.readyState == 4)
+		{
+		  if (this.status == 200)
+		  {
+			if (this.responseText != null)
+			{
+				if( this.responseText == "not_logged_in!" )
+				{
+					window.location = "{{ url_for('index') }}";
+				}
+				else
+				{
+					editPage( mvar1, this.responseText )
+				}
+			}
+			else alert("Ajax error: No data received")
+		  }
+		  else alert( "Ajax error: " + this.statusText)
+		}
+	}
+	
+	waitvar = "<img src=\"" + "{{ url_for('static',filename='loadinfo.gu.gif') }}" + "\">"
+	
+	document.getElementById('sitetitle').innerHTML = sitenamevar + waitvar; //'wait'
+	
+	console.log ( "before send param page" );
+	request.send(params)
+	console.log ( "after  send param page" );
+}
+
+function ajaxRequest()
+{
+	try
+	{
+		var request = new XMLHttpRequest()
+	}
+	catch(e1)
+	{
+		try
+		{
+			request = new ActiveXObject("Msxml2.XMLHTTP")
+		}
+		catch(e2)
+		{
+			try
+			{
+				request = new ActiveXObject("Microsoft.XMLHTTP")
+			}
+			catch(e3)
+			{
+				request = false
+			}
+		}
+	}
+	return request
+}
+
+
+function editPage( reqType = 'blank', jvar = 'blank' )
+{
+	console.log ( "edit page" );
+	console.log ( reqType );
+	console.log ( jvar );
+	
+	document.getElementById('sitetitle').innerHTML = sitenamevar;
+	
+	jvar = JSON.parse( jvar )
+		
+	if( jvar['errMessage'] != null )
+	{
+		console.log( 'hiihi' )
+		document.getElementById('content').innerHTML = document.getElementById('content').innerHTML + '<br>' + jvar['errMessage'];
+		reqType = ''
+	}
+	
+	if( jvar['okMessage'] != null )
+	{ 
+		console.log( 'zxcczx' )
+		newMessage = jvar['okMessage'];
+		location.hash = 'okMessage';	
+
+		reqType = ''
+	}
+	if( reqType == "changePassButton" )
+	{
+		document.getElementById('lname').innerHTML = jvar['name'] + " logged in";
+		document.getElementById('content').innerHTML = jvar['messager'];
+	}
+
+	if( reqType == "closeuserButton" )
+	{
+		document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
+
+		if( jvar['isPwGood'] == 'pwGood' )
+		{
+			closeuservar1 = '<b>are you sure</b><br>\
+				recall and delete all your products<br>\
+				send all other products back to who created them</a><br>\
+				no longer be able to log in as this user ?<br><br>\
+				<TABLE >\
+				<tr class="trq"><td>password</td></tr>\
+				<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
+				<tr class="trq"><td>'
+
+			closeuservar2 = '</td></tr></TABLE >'
+			closeuservarB = '<button onclick="robotButton( \'closeuserButton2\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>'
+			document.getElementById('content').innerHTML = closeuservar1 + closeuservarB + closeuservar2;
+		}
+		else
+		{
+			document.getElementById('content').innerHTML = 'bad password';
+		}
+	}
+	
+	if( reqType == "closeuserButton2" )
+	{
+		console.log( "cb2 " + jvar );
+		if( jvar['loggedOut'] == "not logged in")
+		{
+			console.log( "cb2 not logged in !" );
+			window.location = "{{ url_for('index') }}";
+		}
+		else
+		{
+			document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
+		}
+	}
+	
+	if( reqType == "colours" )
+	{
+		window.location.reload()
+	}
+	
+	if( reqType == "testme" )
+	{
+		document.getElementById('content').innerHTML = 'tested';
+	}
+}
+
+</script>
+
+</head>
+<body><div id="container">
+<div id="wrapper">
+<div id="top2">
+<h1>
+<a id="sitetitle" href="{{ url_for('index') }}">
+	
+
+<script>
+document.write(sitenamevar);
+</script>
+
+</a>
+
+<br>
+
+</h1>
+</div>
+<div id="lname">
+
+{{ name }} logged in
+
+</div>
+</div>
+
+<div id="leftnav">
+
+<a href="{{ url_for('index') }}#testme">testme</a><br>
+<a href="{{ url_for('index') }}#settins">settins</a><br>
+<a href="{{ url_for('auth.logout') }}" >logout</a>
+
+</div>
+
+<div id="content">
+
+</div>
+
+<div id="footer">
+
+<div id="lbox">
+mess
+</div>
+
+<div id="rbox">
+	<a href="{{ url_for('about') }}">2017</a>
+</div>
+
+</div>
+
+</div>
+</body>
+</html>

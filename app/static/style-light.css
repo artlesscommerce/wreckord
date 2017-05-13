@@ -1,0 +1,324 @@
+
+
+
+
+
+
+.clear-both {
+   clear: both;
+}
+
+#pre
+{
+	float:left;
+}
+
+#nex
+{
+	float:right;
+}
+
+#t3
+{
+	width:40%;
+	border:2px solid #383858;                   /* purple */
+}
+
+#t3
+{ 
+	text-align:left;
+}  
+
+#myText { text-align:right; } 
+
+#t1, #t2
+{
+	width:48%;
+	border:2px solid #383858;                   /* purple */
+}
+
+#t1
+{
+	float:left;
+	text-align:left;
+}  
+
+#t2
+{ 
+    float:right;
+    text-align:left;
+}  
+
+#td16
+{
+	width:16%;
+}
+
+
+		
+body
+{
+	background-color:#dfdfdf;                  /* lightgrey */
+	font-family:"Verdana", Sans-serif;
+}
+
+a.b
+{
+	color:blue;                                   /* blue */
+	text-decoration:underline;
+}
+
+
+table
+{
+	border-collapse: collapse;
+	width:100%;
+	text-align:center;
+}
+
+table.blue
+{
+	border-collapse: collapse;
+}
+
+
+table.red
+{
+	border-collapse: collapse;
+	width:75%;
+	border:2px solid #383858;
+}
+
+table.red60
+{
+	border-collapse: collapse;
+	width:60%;
+	border:2px solid #383858;
+}
+
+
+td.red
+{
+	padding-left: 12px;
+	padding-right: 12px;
+	width:20%;
+	border-right: 2px solid #383858;
+}
+
+
+td.red60
+{
+	padding-left: 12px;
+	padding-right: 12px;
+	width:20%;
+	border-right: 2px solid #383858;
+}
+
+
+tr:nth-child(odd) 
+{
+	background-color:#dfdfdf;                      /* lightgrey */
+}
+
+tr:nth-child(even) 
+{
+	background-color:white;                          /* white */
+}
+
+tr.blank 
+{
+	background-color:white;                          /* white */
+}
+
+tr.blank2 
+{
+	background-color: white;                          /* white */
+}
+
+tr.trq 
+{
+	background-color:#dfdfdf;                          /* lightgrey */
+}
+
+td
+{
+	padding-right: 6px
+}
+
+td.blue
+{
+	padding-right: 18px
+}
+
+#container
+{
+width: 99%;
+/*width: 90%;*/
+margin: 10px auto;
+
+background-color: white;                          /* white */
+color: black;                                     /* black */
+border: 5px solid #383858;  /*white*/
+line-height: 130%;
+}
+
+#top
+{
+padding: 1em;
+background-color: #383858;                       /* purple */
+border: 10px solid #383858;                      
+text-decoration:none;
+}
+
+#top a
+{
+	color: #00DB00;                             /* green */
+	text-decoration: none;
+}
+
+
+#top h1
+{
+text-decoration:none;
+padding: 0;
+margin: 0;
+}
+
+
+
+#wrapper
+{
+border: 10px solid #383858;
+background-color: #383858;                 /* purple */
+}
+
+
+#top2
+{
+	float:left;
+	width:40%;
+	padding: 1em;
+	background-color: #383858;            /* purple */
+	border: 0px solid #383858;            /* purple */
+	text-decoration:none;
+}
+
+#top2 a
+{
+	color: #00DB00;                         /* green */
+	text-decoration: none;
+}
+
+
+#top2 h1
+{
+	text-decoration:none;
+	padding: 0;
+	margin: 0;
+}
+
+
+#lname
+{
+	margin-left: 300px;
+	padding: 1em;
+	border: 0px solid #383858;
+	background-color: #383858;
+	text-align: right;
+	color: white;                     /* white */
+}
+
+
+#leftnavpre
+{
+	background-color: white;                  /* white */
+	float: left;
+	width: 200px;
+	margin: 0;
+	border-right: 3px solid #383858;
+	padding: 1em;
+}
+
+a
+{
+	color: blue;                              /* blue */
+	text-decoration:none;
+}
+
+#leftnav
+{
+height: 100%;
+float: left;
+width: 155px;
+margin: 0;
+padding: 1em;
+background-color: white;                  /* white */
+border-right: 3px solid #383858;          /* purple */
+}
+
+#contentpre
+{
+	margin-left: 232px;
+	padding: 1em;
+	/*max-width: 37em;*/
+	border-left: 3px solid #383858;        /* purple */
+	background-color: white;               /* white */
+}
+
+#content
+{
+color: black;                               /* black */ 
+margin-left: 187px;
+padding: 1em;
+padding-bottom: 1.5em;
+/*max-width: 37em;*/
+border-left: 3px solid #383858;
+/*border-left: 3px solid gold;*/
+background-color: white;                 /* white */
+}
+
+
+#content2
+{
+padding: 1em;
+border: 2px solid white;
+background-color: white;                 /* white */
+}
+
+#contentblank
+{
+padding: 1em;
+border: 2px solid white;
+background-color: white;                /* white */
+}
+
+#footer
+{
+	color:white;                         /* white */
+	clear: both; 
+	margin: 0;
+	padding: .5em;
+	background-color: #383858;            /* purple */
+	border: 0px solid #383858;            /* purple */
+}
+
+#footer a
+{
+	color: #00DB00;                      /* green */
+}
+
+#lbox
+{
+	float:left;
+	width:40%;
+	text-decoration:none;
+}
+
+#rbox
+{
+	margin-left: 350px;
+	text-align: right;
+}
+
+#leftnav p { margin: 0 0 1em 0; }
+#content h2 { margin: 0 0 .5em 0; }
