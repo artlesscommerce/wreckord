@@ -36,14 +36,11 @@ changepassvar = '<TABLE >\
 	</td></tr>\
 	</TABLE >'
 
-closeuservar1 = 'recall and delete all your products<br>\
-	send all other products back to who created them</a><br>\
-	no longer be able to log in as this user ?<br><br>\
+closeuservar1 = 'close this user ?<br><br>\
 	<TABLE >\
 	<tr class="trq"><td>password</td></tr>\
 	<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
 	<tr class="trq"><td>'
-	
 
 closeuservar2 = '</td></tr></TABLE >'
 
@@ -166,7 +163,7 @@ function robotButton( mvar1 = '', mvar2 = '', mvar3 = '', mvar4 = '', mvar5 = ''
 		}
 	}
 	
-	waitvar = "<img src=\"" + "{{ url_for('static',filename='loadinfo.gu.gif') }}" + "\">"
+	waitvar = "<img src=\"" + "{{ url_for('static',filename='loadinfo.gif') }}" + "\">"
 	
 	document.getElementById('sitetitle').innerHTML = sitenamevar + waitvar; //'wait'
 	
@@ -240,15 +237,6 @@ function editPage( reqType = 'blank', jvar = 'blank' )
 
 		if( jvar['isPwGood'] == 'pwGood' )
 		{
-			closeuservar1 = '<b>are you sure</b><br>\
-				recall and delete all your products<br>\
-				send all other products back to who created them</a><br>\
-				no longer be able to log in as this user ?<br><br>\
-				<TABLE >\
-				<tr class="trq"><td>password</td></tr>\
-				<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
-				<tr class="trq"><td>'
-
 			closeuservar2 = '</td></tr></TABLE >'
 			closeuservarB = '<button onclick="robotButton( \'closeuserButton2\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>'
 			document.getElementById('content').innerHTML = closeuservar1 + closeuservarB + closeuservar2;
@@ -258,7 +246,7 @@ function editPage( reqType = 'blank', jvar = 'blank' )
 			document.getElementById('content').innerHTML = 'bad password';
 		}
 	}
-	
+
 	if( reqType == "closeuserButton2" )
 	{
 		console.log( "cb2 " + jvar );

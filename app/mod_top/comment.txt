@@ -1,0 +1,6 @@
+
+top module
+
+1. display graphical user interface
+
+2. send commands to the different modules from post requests

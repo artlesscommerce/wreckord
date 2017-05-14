@@ -1,13 +1,12 @@
-from flask import Blueprint, request, render_template, \
-                  flash, g, session, redirect, url_for
-
-from flask import Flask, request, jsonify, render_template, session, url_for, redirect
+from flask import Flask, jsonify, Blueprint, request, render_template, session, redirect, url_for
 
 import json
 from random import randint
 
-from app.mod_utils.utils_one import echos
-
+from app.mod_auth.auth_one import changeStyle
+from app.mod_auth.auth_one import changePassword
+from app.mod_utils.utils_one import areBadStrings
+from app.mod_utils.varfuncs import conFunc
 
 mod_top = Blueprint('top', __name__, url_prefix='/top')
 
@@ -17,35 +16,76 @@ def topit():
 	if 'username' in session:
 		print 'inseess2',session['username'] 
 		var = randint( 100, 10100 )
-		var = '?v=' + str( var )
-		return render_template('top/loggedin.html', mycssfile=session['cssStyle'], sitename='localq', name=session['username'], random=var )
-	else:
-		echos()
-		print 'nopwe2'
-		#session['username'] = 'bounce'
+		var = '?v=' + str( var )#'localq'
+		return render_template('top/loggedin.html', mycssfile=session['cssStyle'], sitename=conFunc( 'sitename' ),\
+		name=session['username'], random=var )
 	print 'topit now'
-	return render_template('top/loggedout.html', sitename='localq' )
+	return render_template('top/loggedout.html', sitename= conFunc( 'sitename' ) )
 
 
 @mod_top.route('/ajax/', methods=['POST'])
 def ajax():
-	print 'yo!!', request.form['jsvar1']
-	if request.form['buttontype'] == 'testme':
-		return json.dumps( {'username':session['username'], 'what':'yay' } )
-	if request.form['buttontype'] == 'colours':
-		return colours()
+	buttontype = 'blank'
+	try:
+		buttontype = request.form['buttontype']
+	except Exception as e:
+		print 'oo ' + (str(e))
 
+	print 'topx!!1', buttontype
+
+	logged_in_var = False
+
+	if 'username' in session:
+		if 'logged_in' in session:
+			if session['logged_in'] == True :
+				logged_in_var = True
+
+	if logged_in_var != True:
+		return 'not_logged_in!'
+
+	if buttontype == 'testme':
+		return json.dumps( {'username':session['username'], 'errMessage':'yay' } )
+	if buttontype == 'colours':
+		return colours()
+	if buttontype == 'changePassButton':
+		return changePassButton()
+	return json.dumps( {'username':session['username'], 'errMessage':'badbuttontype' } )
+
+
+def changePassButton():
+	"change users password"
+	username = session['username']
+
+	badStrings = [ [ 'password', request.form['jsvar1']] ]
+	badStrings.append( [ 'password', request.form['jsvar2'] ] )
+	badStrings.append( [ 'password', request.form['jsvar3'] ] )
+
+	theRes = areBadStrings( badStrings )
+
+	if theRes != False:
+		return json.dumps( { 'username':username, 'errMessage':theRes } )
+
+	s1 = changePassword( username, request.form['jsvar1'], request.form['jsvar2'], request.form['jsvar3'] )
+
+	if s1 == "password changed":
+		s0 = { 'username':username, "okMessage":s1 }
+	else:
+		s0 = { 'username':username, "errMessage":s1 }
+
+	return json.dumps(s0)
 
 
 def colours():
 	"This returns colours"
-	#check bad sting
-	tempVar = url_for('static',filename='style-dark.css')
+	tempVar = 'style-dark.css'
 	if request.form['jsvar1'] == 'light':
-		tempVar = url_for('static',filename='style-light.css')
+		tempVar = 'style-light.css'
 
-	session['cssStyle'] = tempVar
+	tempVar2 = url_for('static',filename = tempVar )
+
+	session['cssStyle'] = tempVar2
+	changeStyle( tempVar )
 	s0 = {'username':session['username'], 'message':'session colour changed' }
 
-	return json.dumps( {'username':session['username'], 'message':'session colour changed' } )
+	return json.dumps( s0 )
 

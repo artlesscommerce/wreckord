@@ -6,10 +6,6 @@ minLength = 2
 maxLength = 25
 
 
-
-def echos():
-	print 'utils'
-
 def areBadStrings( varr ):
 	count = 0
 	vlen = len( varr )

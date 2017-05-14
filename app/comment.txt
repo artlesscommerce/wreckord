@@ -1,0 +1,22 @@
+
+modular user log in app
+
+essential modules
+
+1. mod auth
+
+2. mod_utils
+
+3. mod_top
+
+
+module descriptions
+
+1. mod_auth
+add and edit user name password and settings
+
+2. mod_utils
+check strings and numbers, query database
+
+3. mod_top
+user interface

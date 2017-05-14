@@ -5,7 +5,7 @@ this module:
 
 2. checks users trying to login to users1 table details
 
-3* user can change password in users1 table
+3 user can change password in users1 table
 
 4* every time a user successfully logs in a record is added to login1 table
 
