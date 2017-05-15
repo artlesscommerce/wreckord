@@ -23,6 +23,11 @@ def topit():
 	return render_template('top/loggedout.html', sitename= conFunc( 'sitename' ) )
 
 
+#@mod_top.route('/about/', methods=['GET'])
+def about1():
+	return render_template('top/about.html' )
+
+
 @mod_top.route('/ajax/', methods=['POST'])
 def ajax():
 	buttontype = 'blank'

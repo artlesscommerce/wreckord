@@ -3,6 +3,7 @@ from flask import Flask, render_template
 
 from app.mod_auth.auth_one import signin
 from app.mod_top.top_one import topit
+from app.mod_top.top_one import about1
 
 # Define the WSGI application object
 app = Flask(__name__)
@@ -15,10 +16,10 @@ def index():
 	print 'app index'
 	return topit()
 
-
 @app.route('/about')
 def about():
-	return 'about!'
+	return about1()#'aboutz!'
+
 
 @app.errorhandler(404)
 def not_found(error):
