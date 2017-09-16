@@ -1,22 +1,51 @@
 
 modular user log in app
 
+
 essential modules
 
 1. mod auth
-
 2. mod_utils
-
 3. mod_top
-
 
 module descriptions
 
 1. mod_auth
-add and edit user name password and settings
+add user
+check pw
+change pw
+list users
+get user info
+*close user
+*log signins
 
 2. mod_utils
-check strings and numbers, query database
+check strings
+query database
+log write requests
+log writes
+lock,unlock tables
 
 3. mod_top
 user interface
+
+
+
+optional modules 
+
+1. mod_locat
+
+module descriptions
+
+1. mod_locat
+setLocation
+getLocation
+
+
+
+*todo
+
+
+pip3 install Flask
+pip3 install bcrypt
+python3 run.py 
