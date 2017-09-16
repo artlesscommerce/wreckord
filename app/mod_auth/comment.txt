@@ -1,5 +1,8 @@
 
-this module:
+auth module
+
+essential module
+
 
 1. adds new users to users1 table 
 
@@ -17,20 +20,14 @@ this module:
 
 table structures:
 
+
 CREATE TABLE `users1` (
   `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
   `loginName` varchar(25) NOT NULL,
   `createDate` datetime NOT NULL,
   `hashword` varchar(255) NOT NULL,
-  `thestyle` varchar(25) DEFAULT NULL,
   `closeDate` datetime DEFAULT NULL,
   PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `login1` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `loginName` varchar(25) NOT NULL,
-  `loginTime` datetime NOT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=309 DEFAULT CHARSET=latin1;

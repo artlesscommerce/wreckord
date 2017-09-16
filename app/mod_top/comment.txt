@@ -1,6 +1,13 @@
 
 top module
 
+essential module
+
+
 1. display graphical user interface
 
 2. send commands to the different modules from post requests
+
+3. makes json arrays from modules responses, which gui displays
+
+4* documented api, textbox page

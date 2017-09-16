@@ -1,0 +1,60 @@
+
+utils module
+
+essential module
+
+
+utils_one 
+check strings
+if strings are good it returns False, else it returns comment or error
+
+
+varfuncs
+holds site variables
+get( 'value' ), returns variable or 'blank' 
+* rename conFunc to getSiteVariable
+
+
+dbconnect
+read database
+lock unlock database
+log write requests
+add query, arguments to write list
+write list
+log writes
+
+
+CREATE TABLE `requestLog` (
+  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(45) DEFAULT NULL,
+  `buttonType` varchar(2500) NOT NULL,
+  `args1` varchar(2500) DEFAULT NULL,
+  `message1` varchar(2500) DEFAULT NULL,
+  `dateTime` datetime(3) NOT NULL,
+  `logicStatus` varchar(45) DEFAULT NULL,
+  `writeStatus` varchar(45) DEFAULT NULL,
+  `logicTime` int(11) DEFAULT NULL,
+  `writeTime` int(11) DEFAULT NULL,
+  `endTime` datetime(3) DEFAULT NULL,
+  PRIMARY KEY (`uniqueX`)
+) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `valuepairs` (
+  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `theKey` varchar(50) NOT NULL,
+  `theValue` varchar(2500) NOT NULL,
+  `dateTime` datetime NOT NULL,
+  PRIMARY KEY (`uniqueX`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `writeLog` (
+  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `requestId` int(11) NOT NULL,
+  `username` varchar(45) DEFAULT NULL,
+  `query1` varchar(500) NOT NULL,
+  `args1` varchar(2500) DEFAULT NULL,
+  `dateTime` datetime(3) NOT NULL,
+  PRIMARY KEY (`uniqueX`)
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=latin1;
