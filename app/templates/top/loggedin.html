@@ -20,48 +20,31 @@ now
 <script>
 
 
-sitenamevar = '{{ sitename }} '; 
-
-settinsvar = '\
-<a href="{{ url_for('index') }}#changepass">change password</a><br>\
-<a href="{{ url_for('index') }}#cssfill">colour scheme</a><br>\
-<a href="{{ url_for('index') }}#closeuser">close user</a><br>'
-
-changepassvar = '<TABLE >\
-	<tr class="trq"><td>password</td><td><input  type="password" id="pass1" maxlength="25"></td></tr>\
-	<tr class="trq"><td>new pass</td><td><input  type="password" id="pass2a" maxlength="25"></td></tr>\
-	<tr class="trq"><td>new pass 2</td><td><input  type="password" id="pass2b" maxlength="25"></td></tr>\
-	<tr class="trq"><td></td><td>\
-<button onclick="robotButton( \'changePassButton\', ' + 'document.getElementById(\'pass1\').value, ' + 'document.getElementById(\'pass2a\').value, ' + 'document.getElementById(\'pass2b\').value ' + ' ) ;" >Send</button>\
-	</td></tr>\
-	</TABLE >'
-
-closeuservar1 = 'close this user ?<br><br>\
-	<TABLE >\
-	<tr class="trq"><td>password</td></tr>\
-	<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
-	<tr class="trq"><td>'
-
-closeuservar2 = '</td></tr></TABLE >'
-
-
+sitenamevar = '{{ sitename }} ';
 
 var times = null;
+newMessage = ''
 
+
+function makeUserLink( username )
+{
+	linkVar1  = '<a href="{{ url_for('index') }}#userInfo&*' + username +'">' + username + '</a>'
+	return linkVar1
+}
 
 
 function cssfill()
 {
 	var1 =  '<a onclick="robotButton( \'colours\',\'light\' ) ; return false;" href="">light</a><br>'
 	var1 +=  '<a onclick="robotButton( \'colours\',\'dark\' ) ; return false;" href="">dark</a><br>'
-	
+
 	document.getElementById('content').innerHTML = var1
 }
 
 
 miscHash = function(  )
 {
-	console.log('rzzl')
+//	console.log('rzzl')
 	times = '';
     if (location.hash.length > 0)
     {
@@ -73,23 +56,36 @@ miscHash = function(  )
 		document.getElementById('content').innerHTML = varLoggedIn
 		return 0 ;
 	}
-    
-	x = times.split("&*"); 
+
+	x = times.split("&*");
 	times = x[0]
 
     if (times == 'settins' )
     {
+		settinsvar = '\
+		<a href="{{ url_for('index') }}#changepass">change password</a><br>\
+		<a href="{{ url_for('index') }}#cssfill">colour scheme</a><br>\
+		<a href="{{ url_for('index') }}#closeuser">close user</a><br>'
+
 		document.getElementById('content').innerHTML = settinsvar;
 		return 0 ;
 	}
     if (times == 'okMessage' )
     {
 		document.getElementById('content').innerHTML = newMessage;
-		newMessage = ''
+//		newMessage = ''
 		return 0 ;
 	}
     if (times == 'changepass' )
     {
+		changepassvar = '<TABLE >\
+			<tr class="trq"><td>password</td><td><input  type="password" id="pass1" maxlength="25"></td></tr>\
+			<tr class="trq"><td>new pass</td><td><input  type="password" id="pass2a" maxlength="25"></td></tr>\
+			<tr class="trq"><td>new pass 2</td><td><input  type="password" id="pass2b" maxlength="25"></td></tr>\
+			<tr class="trq"><td></td><td>\
+			<button onclick="robotButton( \'changePassButton\', ' + 'document.getElementById(\'pass1\').value, ' + 'document.getElementById(\'pass2a\').value, ' + 'document.getElementById(\'pass2b\').value ' + ' ) ;" >Send</button>\
+			</td></tr>\
+			</TABLE >'
 		document.getElementById('content').innerHTML = changepassvar;
 		return 0 ;
 	}
@@ -97,18 +93,18 @@ miscHash = function(  )
     {
 		var1  =  '<div id="lightb">lite</div>'
 		var1 +=  '<div id="darkb">darc</div>'
-		
+
 		document.getElementById('content').innerHTML = var1
-		
+
 		myvarfunc1 = function()
 		{
-			robotButton( 'colours','light' ) 
+			robotButton( 'colours','light' )
 		}
 		myvarfunc2 = function()
 		{
-			robotButton( 'colours','dark' ) 
+			robotButton( 'colours','dark' )
 		}
-		
+
 		var a = document.getElementById("lightb");
 		var b = document.getElementById("darkb");
 		a.onclick = myvarfunc1
@@ -118,7 +114,16 @@ miscHash = function(  )
 	}
     if (times == 'closeuser' )
     {
-		document.getElementById('content').innerHTML = closeuservar1 + '<button onclick="robotButton( \'closeuserButton\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>' + closeuservar2;
+		closeuservarNew = 'close this user ?<br><br>\
+			<TABLE >\
+			<tr class="trq"><td>password</td></tr>\
+			<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
+			<tr class="trq"><td>'
+
+		closeuservarNew += '<button onclick="robotButton( \'closeUserButton\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>'
+		closeuservarNew += '</td></tr></TABLE >'
+
+		document.getElementById('content').innerHTML = closeuservarNew
 		return 0 ;
 	}
 
@@ -132,44 +137,42 @@ window.onload       = miscHash
 function robotButton( mvar1 = '', mvar2 = '', mvar3 = '', mvar4 = '', mvar5 = '', mvar6 = '' )
 {
 	console.log ( 'robotButton', mvar1 );
-	
+
 	params  = "buttontype=" + mvar1 + "&jsvar1=" + mvar2 + "&jsvar2=" + mvar3 + "&jsvar3=" + mvar4 + "&jsvar4=" + mvar5 + "&jsvar5=" + mvar6;
 
 	request = new ajaxRequest()
 
 	request.open("POST", "{{ url_for('top.ajax') }}"  )
 	request.setRequestHeader("Content-type", "application/x-www-form-urlencoded")
-	
+
 	request.onreadystatechange = function()
 	{
 		if (this.readyState == 4)
 		{
-		  if (this.status == 200)
-		  {
-			if (this.responseText != null)
+			if (this.status == 200)
 			{
-				if( this.responseText == "not_logged_in!" )
+				if (this.responseText != null)
 				{
-					window.location = "{{ url_for('index') }}";
+					if( this.responseText == "not_logged_in!" )
+					{
+						window.location = "{{ url_for('index') }}";
+					}
+					else
+					{
+						editPage( mvar1, this.responseText )
+					}
 				}
-				else
-				{
-					editPage( mvar1, this.responseText )
-				}
+				else alert("Ajax error: No data received")
 			}
-			else alert("Ajax error: No data received")
-		  }
-		  else alert( "Ajax error: " + this.statusText)
+			else alert( "Ajax error: " + this.statusText)
 		}
 	}
-	
+
 	waitvar = "<img src=\"" + "{{ url_for('static',filename='loadinfo.gif') }}" + "\">"
-	
+
 	document.getElementById('sitetitle').innerHTML = sitenamevar + waitvar; //'wait'
-	
-	console.log ( "before send param page" );
+
 	request.send(params)
-	console.log ( "after  send param page" );
 }
 
 function ajaxRequest()
@@ -200,46 +203,88 @@ function ajaxRequest()
 }
 
 
-function editPage( reqType = 'blank', jvar = 'blank' )
+function editPage( reqType = 'blank', jvarS = 'blank' )
 {
 	console.log ( "edit page" );
 	console.log ( reqType );
-	console.log ( jvar );
-	
+	console.log ( jvarS );
+
 	document.getElementById('sitetitle').innerHTML = sitenamevar;
+	jvar = JSON.parse( jvarS )
+	document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
 	
-	jvar = JSON.parse( jvar )
-		
 	if( jvar['errMessage'] != null )
 	{
-		console.log( 'hiihi' )
+		console.log( 'error message' )
 		document.getElementById('content').innerHTML = document.getElementById('content').innerHTML + '<br>' + jvar['errMessage'];
 		reqType = ''
 	}
-	
+
 	if( jvar['okMessage'] != null )
-	{ 
-		console.log( 'zxcczx' )
+	{
+		console.log( 'ok message' )
 		newMessage = jvar['okMessage'];
-		location.hash = 'okMessage';	
+		location.hash = 'okMessage';
 
 		reqType = ''
 	}
+	
+	
+	if( reqType == "userInfo" )
+	{
+		userpagevar = ''
+
+		if ( jvar['status'] != 'okay' )
+		{
+			userpagevar = jvar['otherUser'] + ' : ' + jvar['status'];
+		}
+		else
+		{
+			userpagevar = '<b>' +  jvar['otherUser'] + '</b><br><br>'
+			userpagevar += 'createDate: ' + jvar['createDate'] + '<br>'
+			// loggedin.html pastepoint 1
+			userpagevar += 'location: '   + jvar['location']
+		}
+		document.getElementById('content').innerHTML = userpagevar;
+	}
+	
+	
+	if( reqType == "listUsers" )
+	{
+		pagevar = 'there are ' + jvar['count'] + ' users<br><br>'
+
+		if ( jvar['count'] > 0 )
+		{
+			for (var i = 0; i < jvar['userList'].length; i++)
+			{
+				pagevar += makeUserLink( jvar['userList'][i] )  + '<br>'
+			}
+		}
+		document.getElementById('content').innerHTML = pagevar;
+	}
+	
+	
 	if( reqType == "changePassButton" )
 	{
-		document.getElementById('lname').innerHTML = jvar['name'] + " logged in";
 		document.getElementById('content').innerHTML = jvar['messager'];
 	}
 
-	if( reqType == "closeuserButton" )
-	{
-		document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
 
+	if( reqType == "closeUserButton" )
+	{
+		document.getElementById('content').innerHTML = 'user not closed'
 		if( jvar['isPwGood'] == 'pwGood' )
 		{
-			closeuservar2 = '</td></tr></TABLE >'
-			closeuservarB = '<button onclick="robotButton( \'closeuserButton2\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>'
-			document.getElementById('content').innerHTML = closeuservar1 + closeuservarB + closeuservar2;
+			closeuservarNew = 'close this user ?<br><br>\
+				<TABLE >\
+				<tr class="trq"><td>password</td></tr>\
+				<tr class="trq"><td><input type="password" id="pass1" maxlength="25"></td></tr>\
+				<tr class="trq"><td>'
+
+			closeuservarNew += '<button onclick="robotButton( \'closeUserButton2\', ' + 'document.getElementById(\'pass1\').value ' + ' ) ;" >close user</button>'
+			closeuservarNew += '</td></tr></TABLE >'
+
+			document.getElementById('content').innerHTML = closeuservarNew
 		}
 		else
 		{
@@ -247,7 +292,7 @@ function editPage( reqType = 'blank', jvar = 'blank' )
 		}
 	}
 
-	if( reqType == "closeuserButton2" )
+	if( reqType == "closeUserButton2" )
 	{
 		console.log( "cb2 " + jvar );
 		if( jvar['loggedOut'] == "not logged in")
@@ -257,16 +302,16 @@ function editPage( reqType = 'blank', jvar = 'blank' )
 		}
 		else
 		{
-			document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
+			document.getElementById('content').innerHTML = 'user not closed';
 		}
 	}
-	
+
 	if( reqType == "colours" )
 	{
 		window.location.reload()
 	}
-	
-	if( reqType == "testme" )
+
+	if( reqType == "test" )
 	{
 		document.getElementById('content').innerHTML = 'tested';
 	}
@@ -280,7 +325,7 @@ function editPage( reqType = 'blank', jvar = 'blank' )
 <div id="top2">
 <h1>
 <a id="sitetitle" href="{{ url_for('index') }}">
-	
+
 
 <script>
 document.write(sitenamevar);
@@ -300,10 +345,19 @@ document.write(sitenamevar);
 </div>
 
 <div id="leftnav">
+	
+<!-- paste -->
 
-<a href="{{ url_for('index') }}#testme">testme</a><br>
+<a href="{{ url_for('index') }}#testme">test</a><br>
+<a href="{{ url_for('index') }}#testyu">test</a><br>
+<a href="{{ url_for('index') }}#listUsers">list users</a><br>
+
+<!-- loggedin.html pastepoint 2 -->
+<a href="{{ url_for('locat.mapmess') }}">location</a><br>
+
 <a href="{{ url_for('index') }}#settins">settins</a><br>
 <a href="{{ url_for('auth.logout') }}" >logout</a>
+
 
 </div>
 
