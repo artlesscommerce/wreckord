@@ -28,12 +28,13 @@ lock,unlock tables
 
 3. mod_top
 user interface
-
+textinput api
 
 
 optional modules 
 
 1. mod_locat
+2. mod_products
 
 module descriptions
 
@@ -41,6 +42,12 @@ module descriptions
 setLocation
 getLocation
 
+2. mod_products
+add product
+get product details
+send product
+get balance
+view send receive log
 
 
 *todo

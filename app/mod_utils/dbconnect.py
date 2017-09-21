@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from time import sleep
 import pymysql
@@ -7,6 +6,7 @@ from app.mod_utils.varfuncs import conFunc
 
 writeQueue     = []
 lockTheTables  = False
+
 
 def connection():
     conn = pymysql.connect(host=    conFunc( 'dbhost' ),
@@ -18,8 +18,21 @@ def connection():
     return c, conn
 
 
+def readcon( q1, args ):
+	try:
+		c, conn = connection()
+		c.execute( q1, args )
+		
+		return c
+
+	except Exception as e:
+		print(  'oo 29 ' + (str(e)), q1  )
+
+	return None
+
+
 def newRequest( username, buttonType, dateNow ):
-	print( 'newRequest : ', dateNow, username, buttonType )
+	print( 'newRequest         :', dateNow, username, buttonType )
 	lastRow = 0
 	try:
 		q1 = 'insert into requestLog ( username, buttonType, dateTime ) values ( %s, %s, %s )'
@@ -38,7 +51,8 @@ def newRequest( username, buttonType, dateNow ):
 
 
 def endRequest( requestId, argsVar, message, logic, write, dateNowLogic, dateNowWrite ):
-	print( 'endRequest : ',requestId, message, logic, write, dateNowLogic, dateNowWrite )
+	dateNow = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+	print( 'endRequest         :', dateNow, requestId, message, logic, write, dateNowLogic, dateNowWrite )
 	try:
 		q1  = 'update requestLog set args1 = %s, message1 = %s, logicStatus = %s, writeStatus = %s, logicTime = %s, '
 		q1 += ' writeTime = %s, endTime = %s where uniqueX = %s '
@@ -64,7 +78,7 @@ def a2q( q1, args ):   # addToWriteQueue
 
 
 def writeToTables( requestId, username ):
-	print( 'writeToTables : ' + str( requestId ) )
+	print( 'writeToTables      :', requestId, len( writeQueue ) ) 
 	for x in writeQueue:
 		var1 = writeQuery( requestId, username, x['q1'], x['args'] )
 		if var1 != 'write okay':
@@ -72,7 +86,7 @@ def writeToTables( requestId, username ):
 	
 	writeQueue.clear()
 	
-	print( 'writeToTables exit : ' + str( requestId ) )
+	print( 'writeToTables exit :', str( requestId ) )
 	return 'okay'
 
 
@@ -126,11 +140,11 @@ def setLocked( strLocked ):
 
 
 def tableLockNotice( noticeMessage, message = '' ):
-	print( 'tableLockNotice ', noticeMessage )
+	print( 'tableLockNotice ', noticeMessage, message  )
 
 
 def writeQuery( requestId, username, q1, args ):
-	print( 'writeQuery' , q1, args, requestId )
+	print( 'writeQuery         :' , q1, args, requestId )
 
 	try:
 		c, conn = connection()
@@ -145,7 +159,7 @@ def writeQuery( requestId, username, q1, args ):
 
 
 def addToQueryLog( requestId, username, query1, args ):
-	print( 'addToQueryLog  : ' , requestId, username, query1, args )
+	print( 'addToQueryLog      :' , requestId, username, query1, args )
 
 	try:
 		q1 = 'insert into writeLog ( requestId, username, query1, args1, dateTime ) values ( %s, %s, %s, %s, %s )'
@@ -158,5 +172,4 @@ def addToQueryLog( requestId, username, query1, args ):
 	except Exception as e:
 		print ( 'oo 155 :' + (str(e)) )
 		return  "write error"
-
 
