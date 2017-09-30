@@ -52,303 +52,19 @@ CREATE TABLE `sendRecLog` (
 
 
 
-to install this module on basic modular user log in app :
-
-requirements : none
-
-1.
-<!-- loggedin.html pastepoint 2 -->
-<a href="{{ url_for('locat.mapmess') }}">location</a><br>
-<a href="{{ url_for('index') }}#balance">balance</a><br>
-<a href="{{ url_for('index') }}#sendRecLog">sendRecLog</a><br>
-
-
-2.
-// loggedin.html pastepoint 3
-if( reqType == "productPage" )
-{
-	productpagevar = '<table id="productpageTable" class="blue"><tr><td>creator</td><td></td></tr><tr><td>product</td>\
-					  <td></td></tr><tr><td>create date</td><td></td></tr>\
-					  <tr><td>details</td><td></td></tr></table>'
-
-	if( jvar['message'] == 'okay' )
-	{
-		pagevar = '<b>' + jvar['cr1'] + ' ' + jvar['pr1'] + '</b><br><br>'
-
-		pagevar += productpagevar + '<br>'
-
-		crpr = jvar['cr1'] + '.' + jvar['pr1']
-		crpr = crprJoin( jvar['cr1'], jvar['pr1'] )
-		
-		pagevar += '<a href="{{ url_for('index') }}#sendAmountForm&*' + crpr +'&*'
-		pagevar += '">send to</a>' + '<br>'
-	
-		document.getElementById('content').innerHTML = pagevar
-
-		var myTable = document.getElementById( 'productpageTable' );
-
-		uservar = ''
-		if( jvar['cr1'] == '' )
-		{
-			uservar = 'localhost'
-		}
-		else
-		{
-			uservar = makeUserLink( jvar['cr1'] )
-		}
-
-		myTable.rows[0].cells[1].innerHTML = uservar 
-
-		myTable.rows[1].cells[1].innerHTML = jvar['pr1']
-		myTable.rows[2].cells[1].innerHTML = jvar['description']
-		myTable.rows[3].cells[1].innerHTML = jvar['dateTime']
-	}
-	else
-	{
-		document.getElementById('content').innerHTML = jvar['message']
-	}
-}
-
-if( reqType == "sendAmountForm" )
-{
-	pagevar = ''
-	varPr = ''
-	
-	if ( typeof jvar['balance'] !== 'undefined')
-	{
-		if ( typeof jvar['balance']['product'] !== 'undefined') 
-		{
-			pagevar = balanceTableFromList( [jvar['balance']], inUse = false, headings = true )
-			varPr = jvar['balance']['product']
-		}
-	}
-
-	varTo = jvar['userTo']
-
-	sendFormVar = '<TABLE >'
-	
-	sendFormVar += '<tr class="trq"><td>to</td><td><input type="text" id="nameto" value="'
-	sendFormVar += varTo
-	sendFormVar += '" maxlength="25"></td></tr>'
-
-	sendFormVar += '<tr class="trq"><td>creator.product</td><td><input type="text" value="'
-	sendFormVar += varPr
-	sendFormVar += '" id="cr1pr1" maxlength="25"></td></tr>'
-
-	sendFormVar += '<tr class="trq"><td>amount</td><td><input type="text" value="'
-	sendFormVar += '0'
-	sendFormVar += '" id="amount1" maxlength="25"></td></tr>'
-
-	varww  = 'document.getElementById(\'nameto\').value, document.getElementById(\'cr1pr1\').value, '
-	varww += 'document.getElementById(\'amount1\').value'
-	newvar2 = '<button name="button100" id="foo" onclick="robotButton( \'sendAmount\', ' + varww + ' ) ;" >Send</a>';
-	
-	sendFormVar += '<tr class="trq"><td></td><td id="buttonhere">'
-	sendFormVar += newvar2
-	sendFormVar += '</td></tr></TABLE >'
-
-	document.getElementById('content').innerHTML = pagevar + '<br>' + sendFormVar;
-}
-
-if( reqType == "balance" )
-{
-	console.log( 'balance' )
-	pagevar = balanceTableFromList( jvar['userList'], inUse = true, headings = true )
-	pagevar += '<br>' + balanceTableFromList( jvar['blankList'], inUse = false, headings = false )
-	pagevar += '<br>' + balanceTableFromList( jvar['otherList'], inUse = false, headings = false )
-	document.getElementById('content').innerHTML = pagevar;
-	document.getElementById('titleId').innerHTML = 'balance';
-}
-
-if( reqType == "sendRecLog" )
-{
-	pagevar = ''
-
-	if ( jvar['rowCount'] > 0 )
-	{
-		myLinks = makePrevNextLinks( jvar['rowCount'], jvar['allRows'], jvar['startfrom'], jvar['results'], 'sendRecLog' )
-		pagevar += myLinks[0] + '<br><br>'
-
-		for (var i = 0; i < jvar['rows'].length; i++)
-		{	
-			if ( i == 0 )
-			{
-				pagevar += '<table>'
-			}
-			
-			userToVar = jvar['rows'][i]['sendSort']
-			if ( jvar['rows'][i]['sendSort'] == 'ordinary' )
-			{
-				userToVar = makeUserLink( jvar['rows'][i]['userTo'] )
-			}
-			
-			pagevar +=  '<tr>'
-			pagevar +=  '<td>'
-			pagevar +=  jvar['rows'][i]['amount']
-			pagevar +=  '</td>'
-			pagevar +=  '<td>'
-			pagevar +=  makeProductLink( jvar['rows'][i]['product'] )
-			pagevar +=  '</td>'
-			pagevar +=  '<td>'
-			pagevar +=  jvar['rows'][i]['sentRecvd']
-			pagevar +=  '</td>'
-			pagevar +=  '<td>'
-			pagevar +=  userToVar
-			pagevar +=  '</td>'
-			pagevar +=  '<td>'
-			t1 = jvar['rows'][i]['dateTime'].split( ' ' )
-			pagevar +=  t1[0] + '<br>'
-			pagevar +=  '</td>'
-			pagevar +=  '<td>'
-			pagevar += t1[1].split( '.' )[0]
-			pagevar +=  '</td>'
-
-			if ( i == jvar['rows'].length - 1 )
-			{
-				pagevar += '</table>'
-				pagevar += '<br>' + myLinks[1]
-			}
-		}
-	}
-	else
-	{
-		pagevar = 'there is nothing here'
-	}
-	document.getElementById('content').innerHTML = pagevar;
-}
-
-
-3.
-// one.js pastepoint 1
-function makeProductLink( product )
-{
-	varr = splitCr1Pr1( product )
-	if( varr[0] == '' )
-	{
-		return '<a href="#productPage&*' + product +'">' + product + '</a>'
-	}
-	return makeUserLink( varr[0] ) + '.' + '<a href="#productPage&*' + product +'">' + varr[1] + '</a>'
-}
-
-	
-function splitCr1Pr1( product )
-{
-	console.log( product )
-	cr1 = ''
-	pr1 = ''
-	varr = product.split( '.' )
-	varrLen = varr.length
-	if( varrLen == 2 )
-	{
-		cr1 = varr[0]
-		pr1 = varr[1]
-	}	
-	if( varrLen == 1 )
-	{
-		pr1 = varr[0]
-	}
-	rvar = [ cr1, pr1 ]
-	return rvar
-}
-	
-
-function crprJoin( cr1, pr1 )
-{
-	if( cr1 == '' )
-	{
-		return pr1
-	}
-	return cr1 + '.' + pr1
-}
-
-
-function balanceTableFromList( balanceList, inUse = false, headings = true )
-{
-	console.log( balanceList )
-	newvar2 = ''
-	listlength = balanceList.length
-	for ( j = 0 ; j < listlength ; j++ )
-	{
-		if( j == 0 )
-		{
-			varup  = ''
-
-			if( ( inUse == true ) && ( headings == true ) )
-			{
-				varup += '<table class="red" id="marketstable">'
-				varup += '<tr>'
-				varup += '<td class="red">score</td>'
-				varup += '<td class="red">available</td>'
-				varup += '<td class="red">in use</td>'
-				varup += '</tr>'
-			}
-
-			if( ( inUse == true ) && ( headings == false ) )
-			{
-				console.log( 'qqqq' )
-				varup += '<table class="red" id="marketstable">'   // table type
-			}
-
-
-			if( ( inUse == false ) && ( headings == false ) )
-			{
-				varup += '<table class="red60" id="marketstable">'   // table type
-			}
-
-			if( ( inUse == false ) && ( headings == true ) )
-			{
-				varup += '<table class="red60" id="marketstable">'   // table type
-				varup += '<tr>'
-				varup += '<td class="red">score</td>'
-				varup += '<td class="red">available</td>'
-				varup += '</tr>'
-			}
-			newvar2 += varup
-		}
-		newvar2 += '<tr><td class="red">'
-
-		newvar2 += makeProductLink( balanceList[j]['product'] ) ;
-		newvar2 += '</td>'
-		newvar2 += '<td class="red">'
-		
-		newvar2 += balanceList[j]['available'];
-		newvar2 += '</td>'
-
-		if( inUse )
-		{
-			newvar2 += '<td class="red">'
-			newvar2 += balanceList[j]['in use'];
-			newvar2 += '</td>'
-			newvar2 += '</tr>'
-		}
-			
-		if( j == listlength - 1 )
-		{
-			newvar2 += '</table>'
-		}
-	}
-	return newvar2
-}
-
-
-
-4.
 # top_one pastepoint 1
-from app.mod_products.products_one import productInfo
-from app.mod_products.products_one import addProduct
-from app.mod_products.products_one import getBalance
-from app.mod_products.products_one import getBalanceAll
-from app.mod_products.products_one import sendAmount
-from app.mod_products.products_one import getSendRecLog
+from app.mod_top.products_top import productPageButton
+from app.mod_top.products_top import balanceButton
+from app.mod_top.products_top import sendAmountButton
+from app.mod_top.products_top import sendAmountFormButton
+from app.mod_top.products_top import sendRecLogButton
 
 
-5.
 # top_one pastepoint 2
 writeReqs.append( 'sendAmount' )
 
 
-6.
-# top_one pastepoint 7
+# top_one pastepoint 3
 if buttonType == 'productPage':
 	return productPageButton()
 if buttonType == 'balance':
@@ -359,146 +75,52 @@ if buttonType == 'sendRecLog':
 	return sendRecLogButton()
 
 
-7.
-# top_one pastepoint 3
+# top_one pastepoint 4
 if buttonType == 'sendAmount':
-	var1 = sendAmountButton( args )
+	var1 = sendAmountButton
 
 
-8.
 
-# top_one pastepoint 5
-def productPageButton():
-	varpr1 = request.form['jsvar1']
-
-	print ( varpr1 )
-	
-	badStrings = [ [ 'product', varpr1, False ] ]
-	theRes = areBadStrings( badStrings )
-
-	if theRes != False:
-		return json.dumps( { 'username':session['username'], 'errMessage':theRes } )
-
-	s1 = productInfo( varpr1 )
-	
-	s1['username'] = session['username']
-	
-	s0j = json.dumps(s1)
-	return s0j
+<!-- loggedin.html pastepoint 1 -->
+<script src="{{ url_for('static',filename='products.js') }}{{ random }}"> </script>
 
 
-def balanceButton():
-	s1 = getBalanceAll( session['username'] )
-	
-	s1['username'] = session['username']
-	
-	s0j = json.dumps(s1)
-	return s0j
+// loggedin.html pastepoint 3
+if( reqType == 'productPage' )
+{
+	varArg = productPage
+	varArg()
+}
+
+if( reqType == 'sendAmountForm' )
+{
+	sendAmountFormPage( jvar )
+	document.getElementById('content').innerHTML = pagevar + '<br>' + sendFormVar;
+}
+
+if( reqType == 'balance' )
+{
+	console.log( 'balance' )
+	pagevar = balanceTableFromList( jvar['userList'], inUse = true, headings = true )
+	pagevar += '<br>' + balanceTableFromList( jvar['blankList'], inUse = false, headings = false )
+	pagevar += '<br>' + balanceTableFromList( jvar['otherList'], inUse = false, headings = false )
+	document.getElementById('content').innerHTML = pagevar;
+	document.getElementById('titleId').innerHTML = 'balance';
+}
+
+if( reqType == 'sendRecLog' )
+{
+	pagevar = sendRecLogPage( jvar )
+	document.getElementById('content').innerHTML = pagevar;
+}
 
 
-def sendAmountButton(  args ):
-	username = session['username']
-
-	userTo  = args[0]
-	product = args[1] 
-	amount  = args[2] 
-
-	badStrings = []
-	badStrings.append( [ 'username', userTo  ] )
-	badStrings.append( [ 'product',  product ] )
-	badStrings.append( [ 'posInt',   amount  ] )
-
-	theRes = areBadStrings( badStrings )
-
-	if theRes != False:
-		return  [ 'logic ok', 'bad arg strings', '', json.dumps( { 'username':username, "errMessage":theRes } ) ]
-
-#		return json.dumps( 'logic ok', { 'username':session['username'], 'errMessage':theRes } )
-
-#	s1 = sendAmount( username, 'zz', 'z1.euro', '1' )
-#	s1 = sendAmount( session['username'], 'zz', 'z2.euro', '2' )
-#	s1 = sendAmount( session['username'], 'z2', 'z2.euro', '2' )
-#	s1 = sendAmount( session['username'], 'z2', 'z2.euro', '50' )
-
-	s1 = sendAmount( username, userTo, product, amount )
-	
-	if s1[0] == 'logic ok':
-		if s1[1] == 'amount sent':
-			s0 = [ 'logic ok', s1[1], json.dumps( args ), json.dumps( { 'username':username, 'okMessage':s1[1] } ) ]
-			return s0
-		s0 = [ 'logic ok', s1[1], json.dumps( args ), json.dumps( { 'username':username, 'errMessage':s1[1] } ) ]
-		return s0
-
-	return s1
+<!-- loggedin.html pastepoint 4 -->
+<a href="{{ url_for('locat.mapmess') }}">location</a><br>
+<a href="#balance">balance</a><br>
 
 
-def sendAmountFormButton():
-	username = session['username']
-	
-	varpr1 = request.form['jsvar1']
-	varTo = request.form['jsvar2']
-	print ( varpr1 )
-	
-	s1 = {}
-	if varpr1 != '':
-		badStrings = [ [ 'product', varpr1, False ] ]
-		theRes = areBadStrings( badStrings )
 
-		if theRes != False:
-			return json.dumps( { 'username':session['username'], 'errMessage':theRes } )
-
-		s2 = getBalance( username, varpr1 )
-		s2['product'] = varpr1
-		s1['balance'] = s2
-
-	s1['userTo'] = varTo
-	s1['username'] = username
-		
-	return json.dumps(s1)
-
-
-def sendRecLogButton():
-	username = session['username']
-
-	startfrom = request.form['jsvar1']
-	results   = request.form['jsvar2']
-	user2     = request.form['jsvar3']
-	prList    = request.form['jsvar4']
-
-	
-	badStrings = []
-	if user2 != '':		
-		badStrings.append( [ 'username', user2, False ] )
-
-	if startfrom == '':
-		startfrom = '0'
-	else:
-		badStrings.append( [ 'posInt', startfrom ] )
-
-	if results == '':
-		results = '10'
-	else:
-		badStrings.append( [ 'posInt', results ] )
-
-	productList = []
-	if prList != '':		
-		productList = prList.split( '-' )
-		for x in productList:
-			badStrings.append( [ 'product', x ] )
-
-	theRes = areBadStrings( badStrings )
-
-	if theRes != False:
-		return json.dumps( { 'username':session['username'], 'errMessage':theRes } )
-
-	s1 = getSendRecLog( startfrom, results, username, user2, productList )
-#	s1 = getSendRecLog( '', '', '', '', ''  )
-	s1['username'] = username
-
-	return json.dumps(s1)
-
-
-9.
 # utils_one pastepoint 1
 if varr[count][0] == 'product':
 	if varr[count][1] == '':
@@ -516,3 +138,14 @@ if varr[count][0] == 'product':
 		if check2 != True:
 			return check2
 
+
+
+<!-- inputapi.html pastepoint 1 -->
+newLocation<br>
+<pre>newLocation addStr addLat addLng</pre><br><br>
+balance<br>
+<pre>balance</pre><br><br>
+send to<br>
+<pre>sendAmount z2 z1.euro 1</pre><br><br>
+my transactions<br>
+<pre>sendRecLog 0 10</pre><br><br>

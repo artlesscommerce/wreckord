@@ -14,6 +14,8 @@ now
 </title>
 
 <script src="{{ url_for('static',filename='one.js') }}{{ random }}"> </script>
+<!-- loggedin.html pastepoint 1 -->
+<script src="{{ url_for('static',filename='products.js') }}{{ random }}"> </script>
 <script >
 
 sitenamevar = '{{ sitename }} ';
@@ -51,10 +53,10 @@ miscHash = function(  )
     if (times == 'settins' )
     {
 		settinsvar = '\
-		<a href="{{ url_for('index') }}#changepass">change password</a><br>\
-		<a href="{{ url_for('index') }}#cssfill">colour scheme</a><br>\
+		<a href="#changepass">change password</a><br>\
+		<a href="#cssfill">colour scheme</a><br>\
 		<a href="{{ url_for('top.input1') }}">input api</a><br>\
-		<a href="{{ url_for('index') }}#closeuser">close user</a><br>'
+		<a href="#closeuser">close user</a><br>'
 
 		document.getElementById('content').innerHTML = settinsvar;
 		return 0 ;
@@ -168,13 +170,13 @@ function robotButton( mvar1 = '', mvar2 = '', mvar3 = '', mvar4 = '', mvar5 = ''
 
 function editPage( reqType = 'blank', jvarS = 'blank' )
 {
-	console.log ( "edit page" );
+	console.log ( 'edit page' );
 	console.log ( reqType );
 	console.log ( jvarS );
 
 	document.getElementById('sitetitle').innerHTML = sitenamevar;
 	jvar = JSON.parse( jvarS )
-	document.getElementById('lname').innerHTML = jvar['username'] + " logged in";
+	document.getElementById('lname').innerHTML = jvar['username'] + ' logged in';
 	
 	if( jvar['errMessage'] != null )
 	{
@@ -192,7 +194,7 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 		reqType = ''
 	}
 	
-	if( reqType == "userInfo" )
+	if( reqType == 'userInfo' )
 	{
 		userpagevar = ''
 
@@ -204,14 +206,14 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 		{
 			userpagevar = '<b>' +  jvar['otherUser'] + '</b><br><br>'
 			userpagevar += 'createDate: ' + jvar['createDate'] + '<br>'
-			// loggedin.html pastepoint 1
+			// loggedin.html pastepoint 2
 			userpagevar += 'location: '   + jvar['location']
 		}
 		document.getElementById('content').innerHTML = userpagevar;
 	}
 	
 	
-	if( reqType == "listUsers" )
+	if( reqType == 'listUsers' )
 	{
 		pagevar = 'there are ' + jvar['count'] + ' users<br><br>'
 
@@ -226,13 +228,13 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 	}
 	
 	
-	if( reqType == "changePassButton" )
+	if( reqType == 'changePassButton' )
 	{
 		document.getElementById('content').innerHTML = jvar['messager'];
 	}
 
 
-	if( reqType == "closeUserButton" )
+	if( reqType == 'closeUserButton' )
 	{
 		document.getElementById('content').innerHTML = 'user not closed'
 		if( jvar['isPwGood'] == 'pwGood' )
@@ -254,13 +256,13 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 		}
 	}
 
-	if( reqType == "closeUserButton2" )
+	if( reqType == 'closeUserButton2' )
 	{
-		console.log( "cb2 " + jvar );
-		if( jvar['loggedOut'] == "not logged in")
+		console.log( 'cb2 ' + jvar );
+		if( jvar['loggedOut'] == 'not logged in')
 		{
-			console.log( "cb2 not logged in !" );
-			window.location = "{{ url_for('index') }}";
+			console.log( 'cb2 not logged in !' );
+			window.location = '{{ url_for('index') }}';
 		}
 		else
 		{
@@ -268,103 +270,30 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 		}
 	}
 
-	if( reqType == "colours" )
+	if( reqType == 'colours' )
 	{
 		window.location.reload()
 	}
 
-	if( reqType == "test" )
+	if( reqType == 'test' )
 	{
 		document.getElementById('content').innerHTML = 'tested';
 	}
 	
 	// loggedin.html pastepoint 3
-	if( reqType == "productPage" )
+	if( reqType == 'productPage' )
 	{
-		productpagevar = '<table id="productpageTable" class="blue"><tr><td>creator</td><td></td></tr><tr><td>product</td>\
-		                  <td></td></tr><tr><td>create date</td><td></td></tr>\
-		                  <tr><td>details</td><td></td></tr></table>'
-
-		if( jvar['message'] == 'okay' )
-		{
-			pagevar = '<b>' + jvar['cr1'] + ' ' + jvar['pr1'] + '</b><br><br>'
-
-			pagevar += productpagevar + '<br>'
-	
-			crpr = jvar['cr1'] + '.' + jvar['pr1']
-			crpr = crprJoin( jvar['cr1'], jvar['pr1'] )
-			
-			pagevar += '<a href="{{ url_for('index') }}#sendAmountForm&*' + crpr +'&*'
-			pagevar += '">send to</a>' + '<br>'
-		
-			document.getElementById('content').innerHTML = pagevar
-
-			var myTable = document.getElementById( 'productpageTable' );
-
-			uservar = ''
-			if( jvar['cr1'] == '' )
-			{
-				uservar = 'localhost'
-			}
-			else
-			{
-				uservar = makeUserLink( jvar['cr1'] )
-			}
-
-			myTable.rows[0].cells[1].innerHTML = uservar 
-
-			myTable.rows[1].cells[1].innerHTML = jvar['pr1']
-			myTable.rows[2].cells[1].innerHTML = jvar['description']
-			myTable.rows[3].cells[1].innerHTML = jvar['dateTime']
-		}
-		else
-		{
-			document.getElementById('content').innerHTML = jvar['message']
-		}
+		varArg = productPage
+		varArg()
 	}
 
-	if( reqType == "sendAmountForm" )
+	if( reqType == 'sendAmountForm' )
 	{
-		pagevar = ''
-		varPr = ''
-		
-		if ( typeof jvar['balance'] !== 'undefined')
-		{
-			if ( typeof jvar['balance']['product'] !== 'undefined') 
-			{
-				pagevar = balanceTableFromList( [jvar['balance']], inUse = false, headings = true )
-				varPr = jvar['balance']['product']
-			}
-		}
-
-		varTo = jvar['userTo']
-
-		sendFormVar = '<TABLE >'
-		
-		sendFormVar += '<tr class="trq"><td>to</td><td><input type="text" id="nameto" value="'
-		sendFormVar += varTo
-		sendFormVar += '" maxlength="25"></td></tr>'
-
-		sendFormVar += '<tr class="trq"><td>creator.product</td><td><input type="text" value="'
-		sendFormVar += varPr
-		sendFormVar += '" id="cr1pr1" maxlength="25"></td></tr>'
-
-		sendFormVar += '<tr class="trq"><td>amount</td><td><input type="text" value="'
-		sendFormVar += '0'
-		sendFormVar += '" id="amount1" maxlength="25"></td></tr>'
-
-		varww  = 'document.getElementById(\'nameto\').value, document.getElementById(\'cr1pr1\').value, '
-		varww += 'document.getElementById(\'amount1\').value'
-		newvar2 = '<button name="button100" id="foo" onclick="robotButton( \'sendAmount\', ' + varww + ' ) ;" >Send</a>';
-		
-		sendFormVar += '<tr class="trq"><td></td><td id="buttonhere">'
-		sendFormVar += newvar2
-		sendFormVar += '</td></tr></TABLE >'
-
+		sendAmountFormPage( jvar )
 		document.getElementById('content').innerHTML = pagevar + '<br>' + sendFormVar;
 	}
 
-	if( reqType == "balance" )
+	if( reqType == 'balance' )
 	{
 		console.log( 'balance' )
 		pagevar = balanceTableFromList( jvar['userList'], inUse = true, headings = true )
@@ -374,62 +303,12 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 		document.getElementById('titleId').innerHTML = 'balance';
 	}
 
-	if( reqType == "sendRecLog" )
+	if( reqType == 'sendRecLog' )
 	{
-		pagevar = ''
-
-		if ( jvar['rowCount'] > 0 )
-		{
-			myLinks = makePrevNextLinks( jvar['rowCount'], jvar['allRows'], jvar['startfrom'], jvar['results'], 'sendRecLog' )
-			pagevar += myLinks[0] + '<br><br>'
-	
-			for (var i = 0; i < jvar['rows'].length; i++)
-			{	
-				if ( i == 0 )
-				{
-					pagevar += '<table>'
-				}
-				
-				userToVar = jvar['rows'][i]['sendSort']
-				if ( jvar['rows'][i]['sendSort'] == 'ordinary' )
-				{
-					userToVar = makeUserLink( jvar['rows'][i]['userTo'] )
-				}
-				
-				pagevar +=  '<tr>'
-				pagevar +=  '<td>'
-				pagevar +=  jvar['rows'][i]['amount']
-				pagevar +=  '</td>'
-				pagevar +=  '<td>'
-				pagevar +=  makeProductLink( jvar['rows'][i]['product'] )
-				pagevar +=  '</td>'
-				pagevar +=  '<td>'
-				pagevar +=  jvar['rows'][i]['sentRecvd']
-				pagevar +=  '</td>'
-				pagevar +=  '<td>'
-				pagevar +=  userToVar
-				pagevar +=  '</td>'
-				pagevar +=  '<td>'
-				t1 = jvar['rows'][i]['dateTime'].split( ' ' )
-				pagevar +=  t1[0] + '<br>'
-				pagevar +=  '</td>'
-				pagevar +=  '<td>'
-				pagevar += t1[1].split( '.' )[0]
-				pagevar +=  '</td>'
-
-				if ( i == jvar['rows'].length - 1 )
-				{
-					pagevar += '</table>'
-					pagevar += '<br>' + myLinks[1]
-				}
-			}
-		}
-		else
-		{
-			pagevar = 'there is nothing here'
-		}
+		pagevar = sendRecLogPage( jvar )
 		document.getElementById('content').innerHTML = pagevar;
 	}
+
 }
 
 </script>
@@ -439,7 +318,7 @@ function editPage( reqType = 'blank', jvarS = 'blank' )
 <div id="wrapper">
 <div id="top2">
 <h1>
-<a id="sitetitle" href="{{ url_for('index') }}">
+<a id="sitetitle" href="">
 
 <script>
 document.getElementById('sitetitle').innerHTML = sitenamevar;
@@ -462,18 +341,17 @@ document.getElementById('sitetitle').innerHTML = sitenamevar;
 	
 <!-- paste -->
 
-<a href="{{ url_for('index') }}#testme">test</a><br>
-<a href="{{ url_for('index') }}#testyu">test</a><br>
-<a href="{{ url_for('index') }}#listUsers">list users</a><br>
+<a href="#testme">test</a><br>
+<a href="#testyu">test</a><br>
+<a href="#listUsers">list users</a><br>
 
-<!-- loggedin.html pastepoint 2 -->
+<!-- loggedin.html pastepoint 4 -->
 <a href="{{ url_for('locat.mapmess') }}">location</a><br>
-<a href="{{ url_for('index') }}#balance">balance</a><br>
-<a href="{{ url_for('index') }}#sendRecLog">sendRecLog</a><br>
-
-<a href="{{ url_for('index') }}#settins">settins</a><br>
+<a href="#balance">balance</a><br>
+<a href="#sendRecLog&*0&*10">sendRecLog</a><br>
+		
+<a href="#settins">settins</a><br>
 <a href="{{ url_for('auth.logout') }}" >logout</a>
-
 
 </div>
 

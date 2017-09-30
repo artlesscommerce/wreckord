@@ -6,7 +6,8 @@ from app.mod_utils.dbconnect import a2q
 
 from app.mod_auth.auth_one import userExists
 
-maxLimit = 500
+
+maxLimit = 500000
 
 
 def addProduct( product, description ):
@@ -125,10 +126,16 @@ def splitCr1Pr1( product ):
 	return [ cr1, pr1 ]
 
 
+
 def getBalance( user, product):
 	cr1pr1 = splitCr1Pr1( product )
 	available = 0
 	inuse     = 0
+	
+	exists = productExists( product )
+	if exists != 'product is okay':
+		myList = { 'message':exists }
+		return { 'message':exists } #myList
 	
 	myList = {}
 	try:
@@ -158,19 +165,22 @@ def getBalance( user, product):
 		return 'error'
 
 	return myList 
-#	myList[ 'in trade' ]  = 0
-#	myList[ 'total' ]     = 0
 
 
 def getCanPay( user, product, amount ):
 	var1 = getBalance(user, product) ['available']
 	if int( var1 ) < int( amount ):
 		return False
+	
 	return True
 
 
 def sendAmount( user, userTo, product, amount, sendSort = 'ordinary' ):
 	print( 'sendAmount         :', user, product, amount, sendSort )
+
+	if user == userTo:
+		return [ 'logic ok', 'users are the same' ]
+
 	
 	exists1 = productExists( product )
 	if exists1 != 'product is okay':
@@ -186,7 +196,7 @@ def sendAmount( user, userTo, product, amount, sendSort = 'ordinary' ):
 
 	varAvail = getBalance(user, product) ['available']
 	if int( varAvail ) < int( amount ):
-		print( 'cant insufficient funds' )
+		print( 'cant insufficient funds', int( varAvail ) , int( amount ) )
 		return [ 'logic ok', 'insufficient funds' ]
 
 	varRecer = getBalance(userTo, product) ['available']
@@ -217,25 +227,26 @@ def sendAmount( user, userTo, product, amount, sendSort = 'ordinary' ):
 
 	print ( 'canPayzzzz:',  newVarAvail,  newVarRecer )
 	
-	return [ 'logic ok', "amount sent" ]
+	return [ 'logic ok', 'amount sent' ]
 
 
-def updateScoresRow( newVar, userTo, product ):
+def updateScoresRow( newVar, user, product ):
 	if newVar == 0:
+		# sales inTrade maybe ok
 		q1 = 'delete from scores1 where who1 = %s and product = %s'
-		args = [ userTo, product ]
+		args = [ user, product ]
 	else:  # newVarAvail > 0
 		q2 = 'select uniqueX from scores1 where who1 = %s and product = %s'
-		args2 = [ userTo, product ]
+		args2 = [ user, product ]
 		try:
 			c = readcon( q2, args2 )
 			row = c.fetchone()
 			if row is not None:
 				q1 = 'update scores1 set amount = %s  where who1 = %s and product  = %s'
-				args = [ newVar, userTo, product ]
+				args = [ newVar, user, product ]
 			else:
 				q1 = 'insert into scores1 ( who1, product, amount )  values ( %s, %s, %s )'
-				args = [ userTo, product, newVar ]
+				args = [ user, product, newVar ]
 		except Exception as e:
 			print( 'oo 223 ; ' +   (str(e)) )
 			return 'error'
@@ -256,7 +267,6 @@ def addToSendRecLog( user, userTo, product, amount, sendSort ):
 
 def getSendRecLog( startfrom, results, user1, user2, productList ):
 	print ( 'getSendRecLog', startfrom, results, user1, user2, productList )
-#	q1 = 'select user, userTo, product, amount, sendSort, dateTime from sendRecLog where product = ANY(%s)'
 	q1 = 'select user, userTo, product, amount, sendSort, dateTime from sendRecLog '
 	q2 = 'select uniqueX from sendRecLog '
 	
@@ -309,8 +319,7 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 
 		myList = []
 		c = readcon( q1, args )
-		print( c._last_executed )
-		myRowCount = c.rowcount
+#		myRowCount = c.rowcount
 		row = c.fetchone()
 		while row is not None:
 			row2 = {}
@@ -332,15 +341,11 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 			myList.append( row2 )
 			row = c.fetchone()
 
-		return { 'rows':myList, 'rowCount':myRowCount, 'allRows':myRowCount2, 'startfrom':startfrom, 'results':results, 'userTo':user2, 'products':productList }
+		return { 'rows':myList, 'allRows':myRowCount2, 'startfrom':startfrom, 'results':results, 'userTo':user2, 'products':productList }
 
 	except Exception as e:
 		print( 'oo 223 ; ' +   (str(e)) )
 		return { 'qqqq': 'error'}
-
-
-def productInfo55():
-	print ( 'product info' )
 
 
 

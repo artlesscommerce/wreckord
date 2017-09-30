@@ -33,14 +33,15 @@ to install this module on basic modular user log in app :
 requirements : none
 
 1.
-copy file to :
+copy files to :
 /app/templates/locat/map.html
+/app/mod_top/locat_top.py
+/app/statics/locat.js
 
 
 2.
 # top_one pastepoint 1
-from app.mod_locat.locat_one import setLocation
-from app.mod_locat.locat_one import getLocation
+from app.mod_top.locat_top import newLocationButton
 
 
 3.
@@ -49,35 +50,14 @@ writeReqs.append( 'newLocation' )
 
 
 4.
-# top_one pastepoint 3
+# top_one pastepoint 4
 if buttonType == 'newLocation':
 	var1 = newLocationButton( args )
 
 
 5.
-# top_one pastepoint 4
+# auth_top pastepoint 1
 s1['location'] = getLocation( varuser )
-
-
-6.
-# top_one pastepoint 5
-def newLocationButton( args ):
-	username = session['username']
-	addStr = args[0]
-	addLat = args[1] 
-	addLng = args[2] 
-
-	s1 = setLocation( username, addStr, addLat, addLng )
-
-	if s1[0] == "logic ok":
-		if s1[1] == "new location set":
-			s0 = [ 'logic ok', s1[1], json.dumps( args ), json.dumps( { 'username':username, "okMessage":s1[1] } ) ]
-			return s0
-		s0 = [ 'logic ok', s1[1], json.dumps( args ), json.dumps( { 'username':username, "errMessage":s1[1] } ) ]
-
-		return s0
-
-	return s1
 
 
 7.
@@ -91,15 +71,18 @@ app.register_blueprint(locat_module)
 
 
 9.
-// loggedin.html pastepoint 1
+// loggedin.html pastepoint 2
 userpagevar += 'location: '   + jvar['location']
 
 
 10.
-<!-- loggedin.html pastepoint 2 -->
+<!-- loggedin.html pastepoint 4 -->
 <a href="{{ url_for('locat.mapmess') }}">location</a><br>
 
 
-
+11.
+<!-- inputapi.html pastepoint 1 -->
+newLocation<br>
+<pre>newLocation addStr addLat addLng</pre><br><br>
 
 
