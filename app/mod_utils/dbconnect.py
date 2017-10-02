@@ -12,7 +12,7 @@ def connection():
     conn = pymysql.connect(host=    conFunc( 'dbhost' ),
                            user =   conFunc( 'dbuser' ),
                            passwd = conFunc( 'dbpasswd' ),
-                           db =     conFunc( 'dbtable' ), autocommit = True    )
+                           db =     conFunc( 'dbtable' ) ) #,  autocommit = True    )
     c = conn.cursor()
 
     return c, conn
@@ -78,12 +78,15 @@ def a2q( q1, args ):   # addToWriteQueue
 
 
 def writeToTables( requestId, username ):
-	print( 'writeToTables      :', requestId, len( writeQueue ) ) 
+	print( 'writeToTables      :', requestId, len( writeQueue ) )
+	
+	c, conn = connection()
 	for x in writeQueue:
-		var1 = writeQuery( requestId, username, x['q1'], x['args'] )
+		var1 = writeQuery( c, conn, requestId, username, x['q1'], x['args'] )
 		if var1 != 'write okay':
 			return 'write error'
 	
+	conn.commit();
 	writeQueue.clear()
 	
 	print( 'writeToTables exit :', str( requestId ) )
@@ -143,13 +146,14 @@ def tableLockNotice( noticeMessage, message = '' ):
 	print( 'tableLockNotice ', noticeMessage, message  )
 
 
-def writeQuery( requestId, username, q1, args ):
+def writeQuery( c, conn, requestId, username, q1, args ):
 	print( 'writeQuery         :' , q1, args, requestId )
 
 	try:
-		c, conn = connection()
+#		c, conn = connection()
 		c.execute( q1, args )
-		return addToQueryLog( requestId, username, q1, args )
+#		conn.commit();
+		return addToQueryLog( c, conn, requestId, username, q1, args )
 
 	except Exception as e:
 		print ( 'oo 93' + (str(e)) )
@@ -158,7 +162,7 @@ def writeQuery( requestId, username, q1, args ):
 	return  "write okay"
 
 
-def addToQueryLog( requestId, username, query1, args ):
+def addToQueryLog( c, conn, requestId, username, query1, args ):
 	print( 'addToQueryLog      :' , requestId, username, query1, args )
 
 	try:
