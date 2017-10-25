@@ -2,6 +2,7 @@ from flask import request, session # render_template, redirect, url_for #Flask, 
 import json
 
 from app.mod_utils.utils_one import areBadStrings
+from app.mod_utils.dbconnect import getAutoIncrement
 from app.mod_locat.locat_one import getLocation
 
 from app.mod_auth.auth_one import changePassword
@@ -9,6 +10,8 @@ from app.mod_auth.auth_one import closeUser
 from app.mod_auth.auth_one import userInfo
 from app.mod_auth.auth_one import listUsers
 from app.mod_auth.auth_one import addUser
+
+from app.mod_products.products_one import addProduct
 
 
 
@@ -107,13 +110,18 @@ def addUserButton( args ):
 
 	if s1[0] == 'logic ok':
 		if s1[1] == 'user added':
-			# top_one pastepoint 6
-			varPr1 = addProduct( args[0] + '.euro', 'one euro' )
-			varPr2 = addProduct( args[0] + '.mbtc', 'one mbtc' )
-			if ( varPr1 == 'product added' ) and ( varPr2 == 'product added' ):
-				s0 = [ 'logic ok', s1[1], json.dumps( [args[0]] ), { "newMessage":s1[1] } ]
+
+			requestList = []
+			requestType = 'addProduct'
+			argsR = [ args[0] + '.euro', 'one euro', args[0] ]
+			requestList.append( [ 'unknown' ,requestType, argsR ] )
+			argsR = [ args[0] + '.mbtc', 'one mbtc', args[0] ]
+			requestList.append( [ 'unknown' ,requestType, argsR ] )
+
+			s0 = [ 'logic ok', s1[1], json.dumps( [args[0]] ), { "newMessage":s1[1], 'requestList':requestList } ]
 			return s0
-		s0 = [ 'logic ok', s1[1], json.dumps( [args[0]] ), { "newMessage":s1[1] } ]
+
+		s0 = [ 'logic ok', s1[1], json.dumps( [args[0]] ), { "newMessage":s1[1], 'requestList':None } ]
 		return s0
 
 	return s1

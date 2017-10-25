@@ -1,3 +1,4 @@
+
 function makeProductLink( product )
 {
 	varr = splitCr1Pr1( product )
@@ -22,7 +23,7 @@ function roundToPlaces(num, nume, blankZero = '0')
 	return +(Math.round(num + "e+" + nume )  + "e-" + nume );
 }
 
-	
+
 function splitCr1Pr1( product )
 {
 	cr1 = ''
@@ -148,7 +149,7 @@ function balanceTableFromList( balanceList, inUse = false, headings = true )
 				varup += '<table class="red60" id="marketstable">'   // table type
 				varup += '<tr>'
 				varup += '<td class="red">score</td>'
-				varup += '<td class="red">total</td>'
+				varup += '<td class="red">available</td>'
 				varup += '</tr>'
 			}
 			newvar2 += varup
@@ -158,7 +159,7 @@ function balanceTableFromList( balanceList, inUse = false, headings = true )
 		newvar2 += makeProductLink( balanceList[j]['product'] ) ;
 		newvar2 += '</td>'
 		newvar2 += '<td class="red">'
-		newvar2 += roundToPlaces( balanceList[j]['total'] * 0.001, 3 );
+		newvar2 += roundToPlaces( balanceList[j]['available'] * 0.001, 3 );
 		newvar2 += '</td>'
 
 		if( inUse )
@@ -176,6 +177,7 @@ function balanceTableFromList( balanceList, inUse = false, headings = true )
 	}
 	return newvar2
 }
+
 
 
 function sendAmountFormPage( jvar )

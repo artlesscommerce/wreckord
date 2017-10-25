@@ -25,7 +25,8 @@ log writes
 
 
 CREATE TABLE `requestLog` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `parent_id` int(11) NOT NULL DEFAULT '0',
   `username` varchar(45) DEFAULT NULL,
   `buttonType` varchar(2500) NOT NULL,
   `args1` varchar(2500) DEFAULT NULL,
@@ -36,25 +37,25 @@ CREATE TABLE `requestLog` (
   `logicTime` int(11) DEFAULT NULL,
   `writeTime` int(11) DEFAULT NULL,
   `endTime` datetime(3) DEFAULT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=InnoDB AUTO_INCREMENT=148 DEFAULT CHARSET=latin1;
-
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2227 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `valuepairs` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `theKey` varchar(50) NOT NULL,
   `theValue` varchar(2500) NOT NULL,
   `dateTime` datetime NOT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE `writeLog` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `requestId` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `request_id` int(11) NOT NULL,
   `username` varchar(45) DEFAULT NULL,
   `query1` varchar(500) NOT NULL,
   `args1` varchar(2500) DEFAULT NULL,
   `dateTime` datetime(3) NOT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6188 DEFAULT CHARSET=latin1;
+
+

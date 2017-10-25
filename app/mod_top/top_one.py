@@ -14,9 +14,12 @@ from app.mod_utils.dbconnect import writeToTables
 from app.mod_utils.dbconnect import lockTables
 from app.mod_utils.dbconnect import unLockTables
 from app.mod_utils.dbconnect import tableLockNotice
+
 from app.mod_utils.varfuncs import conFunc
 
 # top_one pastepoint 1
+
+#from app.mod_auth.auth_one import userNameToId
 
 from app.mod_top.locat_top import newLocationButton
 
@@ -29,8 +32,11 @@ from app.mod_top.auth_top import addUserButton
 from app.mod_top.products_top import productPageButton
 from app.mod_top.products_top import balanceButton
 from app.mod_top.products_top import sendAmountButton
+from app.mod_top.products_top import sendAmountButtonNew
 from app.mod_top.products_top import sendAmountFormButton
 from app.mod_top.products_top import sendRecLogButton
+from app.mod_top.products_top import addProductButton
+
 
 
 mod_top = Blueprint('top', __name__ )
@@ -38,7 +44,7 @@ mod_top = Blueprint('top', __name__ )
 
 def topit():
 	if 'username' in session:
-		print ( 'in session : ',session['username'] )
+		print ( 'in session : ',session['username'], session['user_id'] )
 		var = randint( 100, 10100 )
 		var = '?v=' + str( var )#'localq'
 		return render_template('top/loggedin.html', mycssfile=session['cssStyle'], sitename=conFunc( 'sitename' ),\
@@ -68,6 +74,8 @@ def input1():
 	return 'not logged in'
 
 
+
+
 @mod_top.route('/newuser2', methods=['POST'])
 def newuser2():
 	username = request.form['jsvar1'].lower()
@@ -78,16 +86,18 @@ def newuser2():
 	
 	var = ajaxWrite( 'addUser', 'unknown', args )
 
-	return var #json.dumps( { 'newMessage':var } )
+	return var
+
 
 
 @mod_top.route('/ajax/', methods=['POST'])
 def ajax():
+	print ( 'ajax ooo' )
 	buttonType = 'blank'
 	try:
 		buttonType = request.form['buttontype']
 	except Exception as e:
-		print( 'oo ' + (str(e)) )
+		print( 'oo 114' + (str(e)) )
 
 	print ('\ntop ajax', buttonType )
 
@@ -106,9 +116,12 @@ def ajax():
 	# top_one pastepoint 2
 	writeReqs.append( 'newLocation' )
 	writeReqs.append( 'sendAmount' )
+	writeReqs.append( 'addTrade' )
+	writeReqs.append( 'deleteTrade' )
 
 	if buttonType in writeReqs:
-		return ajaxWrite( buttonType, session['username'] )
+		qwe =  ajaxWrite( buttonType, session['username'] )
+		return qwe
 
 	if buttonType == 'testme':
 		return json.dumps( {'username':session['username'], 'errMessage':'yay' } )
@@ -158,9 +171,10 @@ def lockUnlock( argFunc, buttonType, username, args = None ):
 	if lockVar != 'okay':
 		return json.dumps( { 'username':username, 'errMessage':'table is locked' } )
 	
-	varAjax = newAjaxRequest( argFunc, buttonType, username, args = None )
+	varAjax = newAjaxRequest( argFunc, buttonType, username, args )
 
 	if varAjax[0] == 'unlock tables':
+		# put thimgs here
 		unLockTables()
 		
 		if buttonType == 'deleteTrade':
@@ -168,11 +182,14 @@ def lockUnlock( argFunc, buttonType, username, args = None ):
 		return json.dumps( varAjax[1] )
 		
 	tableLockNotice( varAjax[0], varAjax[1] )
-	return [ varAjax[0], varAjax[1] ]
+	
+	return json.dumps( { 'username':username, 'errMessage':'table is locked' } )
+	#return [ varAjax[0], varAjax[1] ]
 
 
-def newAjaxRequest( argFunc, buttonType, username, args = None ):
-	print ( 'newAjaxRequest' )
+def newAjaxRequest( argFunc, buttonType, username, args = None, parent_id = 0 ):
+	print ( 'newAjaxRequest', args )
+	print ( 'parent_id', parent_id )
 	
 	if args == None:
 		args = getArgs()
@@ -182,9 +199,9 @@ def newAjaxRequest( argFunc, buttonType, username, args = None ):
 	dateNowWrite = '0'
 	message = ''
 	
-	requestId = newRequest( username, buttonType, dateNow )
+	requestId = newRequest( username, parent_id, buttonType, dateNow )
 	
-	if requestId < 1:
+	if int(requestId) < 1:
 		return [ 'bad write', 'new request' ]
 
 	timerVar1 = int(round(time.time() * 1000))
@@ -205,7 +222,22 @@ def newAjaxRequest( argFunc, buttonType, username, args = None ):
 
 		if writeVar == 'okay':
 			endRequest( requestId, args2, var1[1], 'pass', 'pass', dateNowLogic, dateNowWrite )
-			# top_one pastepoint 5
+
+			print ( 'get side0', args[0], args[1], jsonVar, '\n'  )
+			
+			if jsonVar.get( 'requestList', None ) != None:
+				print ( ' more requests...' )
+				print ( ' more requests...', jsonVar['requestList'] )
+				for x in jsonVar['requestList']:
+					print ( '\nnewReq', x )
+					varR1 = 'xrequest list not None'
+					if x[1] == 'sendAmount':
+						varR1 = newAjaxRequest( sendAmountButtonNew, x[1], x[0], x[2], requestId )
+					if x[1] == 'addProduct':
+						varR1 = newAjaxRequest( addProductButton, x[1], x[0], x[2], requestId )
+					if varR1[0] != 'unlock tables':
+						return varR1
+						
 			return ['unlock tables', jsonVar ]
 
 		else:
@@ -213,6 +245,7 @@ def newAjaxRequest( argFunc, buttonType, username, args = None ):
 			return [ 'bad write', writeVar ]
 	else:
 		endRequest( requestId, '', message, 'fail', 'false', dateNowLogic, dateNowWrite )
+		
 		print ( var1 )
 		return [ 'bad logic', var1 ]
 
@@ -248,8 +281,5 @@ def colours():
 
 	return json.dumps( s0 )
 	
-
-
-# top_one pastepoint 6
 
 

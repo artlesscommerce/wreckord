@@ -31,16 +31,19 @@ def readcon( q1, args ):
 	return None
 
 
-def newRequest( username, buttonType, dateNow ):
+def newRequest( username, parent_id, buttonType, dateNow ):
 	print( 'newRequest         :', dateNow, username, buttonType )
 	lastRow = 0
 	try:
-		q1 = 'insert into requestLog ( username, buttonType, dateTime ) values ( %s, %s, %s )'
+		q1 = 'insert into requestLog ( username, parent_id, buttonType, dateTime ) values ( %s, %s, %s, %s )'
 
-		args2 = [ username, buttonType, dateNow ]
+		args2 = [ username, parent_id, buttonType, dateNow ]
 
 		c, conn = connection()
+		
+		
 		c.execute( q1, args2 )
+		conn.commit()
 		lastRow = c.lastrowid
 
 	except Exception as e:
@@ -55,7 +58,7 @@ def endRequest( requestId, argsVar, message, logic, write, dateNowLogic, dateNow
 	print( 'endRequest         :', dateNow, requestId, message, logic, write, dateNowLogic, dateNowWrite )
 	try:
 		q1  = 'update requestLog set args1 = %s, message1 = %s, logicStatus = %s, writeStatus = %s, logicTime = %s, '
-		q1 += ' writeTime = %s, endTime = %s where uniqueX = %s '
+		q1 += ' writeTime = %s, endTime = %s where id = %s '
 
 		dateNow = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 #		dateNow = strftime("%Y-%m-%d %H:%M:%S")
@@ -63,6 +66,7 @@ def endRequest( requestId, argsVar, message, logic, write, dateNowLogic, dateNow
 
 		c, conn = connection()
 		c.execute( q1, args )
+		conn.commit()
 
 	except Exception as e:
 		print ( 'oo 54' + (str(e)) )
@@ -147,7 +151,7 @@ def tableLockNotice( noticeMessage, message = '' ):
 
 
 def writeQuery( c, conn, requestId, username, q1, args ):
-	print( 'writeQuery         :' , q1, args, requestId )
+	print( 'writeQuery         :' , q1,  requestId ) #args,
 
 	try:
 #		c, conn = connection()
@@ -163,17 +167,33 @@ def writeQuery( c, conn, requestId, username, q1, args ):
 
 
 def addToQueryLog( c, conn, requestId, username, query1, args ):
-	print( 'addToQueryLog      :' , requestId, username, query1, args )
+	print( 'addToQueryLog      :' , requestId, ':', username, query1,  ) #args
 
 	try:
-		q1 = 'insert into writeLog ( requestId, username, query1, args1, dateTime ) values ( %s, %s, %s, %s, %s )'
+		q1 = 'insert into writeLog ( request_id, username, query1, args1, dateTime ) values ( %s, %s, %s, %s, %s )'
 		dateNow = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 		args2 = [ requestId, username, query1, str( args ), dateNow ]
-		c, conn = connection()
+#		c, conn = connection()
 		c.execute( q1, args2 )
 		return  "write okay"
 
 	except Exception as e:
 		print ( 'oo 155 :' + (str(e)) )
 		return  "write error"
+
+
+
+def getAutoIncrement( tableName ):
+	q1 = '''
+	SELECT `AUTO_INCREMENT`
+	FROM  INFORMATION_SCHEMA.TABLES
+	WHERE TABLE_SCHEMA = 'dbschema'
+	AND   TABLE_NAME   = %s ;
+	'''
+	c = readcon( q1, [ tableName ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
+
 

@@ -1,13 +1,18 @@
-from flask import request, session # render_template, redirect, url_for #Flask, jsonify, Blueprint
+from flask import request, session
 import json
 
 from app.mod_utils.utils_one import areBadStrings
 
 from app.mod_products.products_one import productInfo
-from app.mod_products.products_one import getBalance
-from app.mod_products.products_one import getBalanceAll
+from app.mod_products.products_one import getBalance	
+from app.mod_products.products_one import getBalanceAll	
 from app.mod_products.products_one import sendAmount
 from app.mod_products.products_one import getSendRecLog
+
+from app.mod_products.products_one import prNameToId
+from app.mod_products.products_one import addProduct
+
+from app.mod_auth.auth_one import userNameToId
 
 
 def productPageButton():
@@ -28,8 +33,7 @@ def productPageButton():
 
 
 def balanceButton():
-	s1 = getBalanceAll( session['username'] )
-	
+	s1 = getBalanceAll( session['user_id'] )
 	s1['username'] = session['username']
 	
 	s0j = json.dumps(s1)
@@ -53,7 +57,14 @@ def sendAmountButton(  args ):
 	if theRes != False:
 		return  [ 'logic ok', 'bad arg strings', '', { 'username':username, "errMessage":theRes } ]
 
-	s1 = sendAmount( username, userTo, product, amount )
+	product_id = prNameToId( product )
+
+	userBal = getBalance(  session['user_id'], product_id )
+	userAvailableVar1 = int( userBal['available'] )
+	
+	user2_id = userNameToId( userTo )
+
+	s1 = sendAmount( session['user_id'], user2_id, product_id, amount, userAvailable = userAvailableVar1 )
 	
 	if s1[0] == 'logic ok':
 		if s1[1] == 'amount sent':
@@ -61,8 +72,42 @@ def sendAmountButton(  args ):
 			return s0
 		s0 = [ 'logic ok', s1[1], json.dumps( args ), { 'username':username, 'errMessage':s1[1] } ]
 		return s0
-
 	return s1
+
+
+def sendAmountButtonNew( args ):   # _id
+	username = session['username']
+
+	user1_id  = args[0]     # From
+	user2_id  = args[1]     # To
+	product_id  = args[2] 
+	amount    = args[3] 
+	sendSort  = args[4] 
+
+	badStrings = []
+	badStrings.append( [ 'posInt',  user1_id   ] )
+	badStrings.append( [ 'posInt',  user2_id   ] )
+	badStrings.append( [ 'posInt',  product_id ] )
+	badStrings.append( [ 'posInt',  amount     ] )
+
+	theRes = areBadStrings( badStrings )
+
+	if theRes != False:
+		return  [ 'logic ok', 'bad arg strings', '', { 'username':username, "errMessage":theRes } ]
+
+	userBal = getBalance(  user1_id, product_id )
+	userAvailableVar1 = int( userBal['available'] )
+
+	s1 = sendAmount( user1_id, user2_id, product_id, amount, userAvailable = userAvailableVar1 )
+	
+	if s1[0] == 'logic ok':
+		if s1[1] == 'amount sent':
+			s0 = [ 'logic ok', s1[1], json.dumps( args ), { 'username':username, 'okMessage':s1[1] } ]
+			return s0
+		s0 = [ 'logic ok', s1[1], json.dumps( args ), { 'username':username, 'errMessage':s1[1] } ]
+		return s0
+	return s1
+
 
 
 def sendAmountFormButton():
@@ -80,7 +125,7 @@ def sendAmountFormButton():
 		if theRes != False:
 			return json.dumps( { 'username':session['username'], 'errMessage':theRes } )
 
-		s2 = getBalance( username, varpr1 )
+		s2 = getBalance( userNameToId( username ), prNameToId( varpr1 ) )
 		s2['product'] = varpr1
 		s1['balance'] = s2
 
@@ -130,3 +175,16 @@ def sendRecLogButton():
 
 	return json.dumps(s1)
 
+
+def addProductButton( args ):
+	prName = args[0]
+	prDesc = args[1]
+	prCrea = args[2]
+	user_id = userNameToId( args[2] )
+
+	var1 = addProduct( prName, prDesc, user_id )
+	username = session.get( 'username', '' )
+	s0 = [ 'logic ok', var1, json.dumps( args ), { 'username':username, 'okMessage':var1[1] } ]
+	return s0
+
+	

@@ -1,4 +1,4 @@
-from flask import request, session # render_template, redirect, url_for #Flask, jsonify, Blueprint, 
+from flask import request, session
 import json
 
 from app.mod_locat.locat_one import setLocation
@@ -9,7 +9,7 @@ def newLocationButton( args ):
 	addLat = args[1] 
 	addLng = args[2] 
 
-	s1 = setLocation( username, addStr, addLat, addLng )
+	s1 = setLocation( session['user_id'], addStr, addLat, addLng )
 
 	if s1[0] == "logic ok":
 		if s1[1] == "new location set":

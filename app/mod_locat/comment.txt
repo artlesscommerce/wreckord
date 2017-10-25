@@ -14,18 +14,16 @@ user may set their location
 
 4. add link to loggedin.html sidebar, add line to loggedin.html userInfo page
 
-
-CREATE TABLE `userLocations` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(45) DEFAULT NULL,
+CREATE TABLE `userLocation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
   `status1` varchar(45) DEFAULT NULL,
   `addStr` varchar(300) DEFAULT NULL,
   `addLat` varchar(45) DEFAULT NULL,
   `addLng` varchar(45) DEFAULT NULL,
   `dateTime` datetime DEFAULT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
-
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
 
 to install this module on basic modular user log in app :

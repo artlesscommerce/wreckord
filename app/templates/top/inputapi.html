@@ -154,7 +154,7 @@ send to<br>
 <pre>sendAmount z2 z1.euro 1</pre><br><br>
 my transactions<br>
 <pre>sendRecLog 0 10</pre><br><br>
-addTrade<br>
+
 
 <br>
 <br>
@@ -206,8 +206,7 @@ buffer = StringIO()
 c = pycurl.Curl()
 c.setopt(c.URL, 'http://127.0.0.1:8080/input/')
 
-#post_data = { 'buttontype':'balance' }
-post_data = { 'buttontype':'markets', 'jsvar1':'0', 'jsvar2':'10'}
+post_data = { 'buttontype':'balance' }
 postfields = urllib.urlencode(post_data)
 c.setopt(c.POSTFIELDS, postfields)
 
@@ -232,6 +231,10 @@ print(body)
 
     varww = 'document.getElementById( \'eventinput\' ).value'
 	newvar2 = '<button name="button100" id="foo" onclick="robotButton( ' + varww + ' ) ;" >Send</a>';
-
 	document.getElementById('button1').innerHTML = newvar2
+
+
+
+	
+	console.log ( 'add2'  , newvar2);
 </script>

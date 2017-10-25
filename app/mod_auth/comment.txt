@@ -4,13 +4,13 @@ auth module
 essential module
 
 
-1. adds new users to users1 table 
+1. adds new users to user table 
 
-2. checks users trying to login to users1 table details
+2. checks users trying to login to user table details
 
 3 user can change password in users1 table
 
-4* every time a user successfully logs in a record is added to login1 table
+4* every time a user successfully logs in a record is added to login table
 
 5. a user can log out and the session is cleared
 
@@ -20,14 +20,11 @@ essential module
 
 table structures:
 
-
-CREATE TABLE `users1` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `loginName` varchar(25) NOT NULL,
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(25) NOT NULL,
   `createDate` datetime NOT NULL,
   `hashword` varchar(255) NOT NULL,
   `closeDate` datetime DEFAULT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
-
-
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;

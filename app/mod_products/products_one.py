@@ -3,22 +3,26 @@ from datetime import datetime
 
 from app.mod_utils.dbconnect import readcon
 from app.mod_utils.dbconnect import a2q
+from app.mod_utils.dbconnect import getAutoIncrement
 
 from app.mod_auth.auth_one import userExists
-
+from app.mod_auth.auth_one import userExists_id
+from app.mod_auth.auth_one import userNameToId
+from app.mod_auth.auth_one import userIdToName
 
 maxLimit = 500000
 
 
-def addProduct( product, description ):
+def addProduct( product, description, productCreator = '0' ):
 	"add a new product"
 	try:
-		var1 = productExists( product )
+		var1 = productExistsName( product )
 		if var1 != 'no product':
 			return 'product is not free'
 		dateNow = strftime("%Y-%m-%d %H:%M:%S")
-		q1  = 'INSERT INTO products1 ( productName, detail, dateTime ) VALUES ( %s, %s, %s )'
-		args = [ product, description, dateNow ]
+
+		q1  = 'INSERT INTO product ( user_id, name, detail, dateTime ) VALUES ( %s, %s, %s, %s )'
+		args = [ productCreator, product, description, dateNow ]
 		a2q( q1, args )
 		return 'product added'
 
@@ -27,41 +31,65 @@ def addProduct( product, description ):
 		return 'error'
 
 
-def productExists( product ):
+def productExists( prId ):
+	print ( 'pr exists', prId  )
 	try:
-		q1 = "SELECT uniqueX, status1 FROM products1 WHERE productName = %s "
-		args = [ product ]
-		c = readcon( q1, args )
+		q1 = "SELECT status1 FROM product WHERE id = %s "
+		c = readcon( q1, [ prId ] )
 		fo = c.fetchone()
 		if fo == None:
 			return 'no product'
-		if fo[1] == 'okay':
+		if fo[0] == 'okay':
 			return 'product is okay'
-		return 'product is ' + str( fo[1] )
+		return 'product is ' + str( fo[0] )
 
 	except Exception as e:
 		print ( 'oo' + (str(e)) )
 		return 'error'
 
 
-def getProductsUserList( username ):
-	return [ username + '.mbtc', username + '.euro' ]
+def productExistsName( prName ):
+	print ( 'pr exists name', prName  )
+	try:
+		q1 = "SELECT status1 FROM product WHERE name = %s "
+		c = readcon( q1, [ prName ] )
+		fo = c.fetchone()
+		if fo == None:
+			return 'no product'
+		if fo[0] == 'okay':
+			return 'product is okay'
+		return 'product is ' + str( fo[0] )
+
+	except Exception as e:
+		print ( 'oo' + (str(e)) )
+		return 'error'
 
 
-def getProductsBlankList( username ):
-	return [ 'mbtc', 'euro' ]
+def getProductsUserList( user_id ):
+	# select all from product where user_id = user_id
+	username = userIdToName( user_id )
+	pr1 = prNameToId( username + '.mbtc' )
+	pr2 = prNameToId( username + '.euro' )
+	return [ pr1, pr2 ]
 
 
-def getProductsOtherList( username ):
+def getProductsBlankList():
+	# select all from product where user_id = 0
+	return [ 1, 2 ]
+#	return [ 'mbtc', 'euro' ]
+
+
+def getProductsOtherList( user_id ):
 	myList = []
-	q1 = 'select product from scores1 where who1 = %s '
-	args = [ username ]
+	q1 = 'select product_id from score where user_id = %s '
+	args = [ user_id ]
 	try:
 		c = readcon( q1, args )
 		row = c.fetchone()
 		while row is not None:
-			crpr = splitCr1Pr1( row[0] )
-			if crpr[0] != username:
+			crpr = getPrCrId( row[0] )
+#			crpr = splitCr1Pr1( row[0] )
+			if int( crpr ) != int( user_id ):
 				myList.append( row[0] )
 			row = c.fetchone()
 
@@ -72,31 +100,38 @@ def getProductsOtherList( username ):
 	return myList	
 	
 
-def getBalanceAll( username ):
+def getBalanceAll( user_id ):
 	print ( 'get balance' )
-	userList  = getProductsUserList( username )
-	blankList = getProductsBlankList( username )
-	otherList = getProductsOtherList( username )
+	userList  = getProductsUserList(  user_id )
+	blankList = getProductsBlankList()
+	otherList = getProductsOtherList( user_id )
 
-	uList = getBalanceOfList( username, userList  )
-	bList = getBalanceOfList( username, blankList )
-	oList = getBalanceOfList( username, otherList )
+	uList = getBalanceOfList( user_id, userList, int(user_id)  )
+	bList = getBalanceOfList( user_id, blankList, 0  )
+	oList = getBalanceOfList( user_id, otherList )
 
 	return { 'userList':uList, 'blankList':bList, 'otherList':oList }
 
 
-def getBalanceOfList( username, productList ):
+
+def getBalanceOfList( user_id, productList, prCrId = None ):
+	print ( 'qqq', productList ) # productList in id
 	myList = []
 	print ( productList )
 	for x in productList:
-		y = getBalance( username, x )
-		y['product'] = x
+		if prCrId == None:
+			prCrId2 = getPrCrId( x )
+			y = getBalance( user_id, x, prCrId2 )
+		else:
+			y = getBalance( user_id, x, prCrId )
+		y['product'] = prIdToName( x )
 		myList.append( y )
 	return myList
 
 
+# change 
 def productInfo( productName ):
-	q1 = 'select detail, datetime from products1 where productName = (%s) and status1 = "okay" '
+	q1 = 'select detail, datetime from product where name = (%s) and status1 = "okay" '
 	args = [ productName ]
 	try:
 		c = readcon( q1, args )
@@ -109,8 +144,6 @@ def productInfo( productName ):
 	except Exception as e:
 		print( 'oo 64; ' +   (str(e)) )
 		return { 'message':'error' }
-
-
 
 
 def splitCr1Pr1( product ):
@@ -126,34 +159,95 @@ def splitCr1Pr1( product ):
 	return [ cr1, pr1 ]
 
 
+def getPrCrId( idPr ):
+	print('zxc')
+#	return '10'
+	q1 = 'SELECT user_id FROM product where id = %s'
+	c = readcon( q1, [ idPr ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
 
-def getBalance( user, product):
-	cr1pr1 = splitCr1Pr1( product )
+
+
+def getBalance( user_id, product_id, prCrId = None ):
+	print ( 'getBalance ', user_id, product_id, prCrId )
+
 	available = 0
 	inuse     = 0
+	total     = 0
+	inTrade   = 0
 	
-	exists = productExists( product )
+	if prCrId == None:
+		prCrId = getPrCrId( product_id )
+	
+	exists = productExists( product_id )
 	if exists != 'product is okay':
-		myList = { 'message':exists }
-		return { 'message':exists } #myList
+		print ( exists )
+		return { 'message':exists }
 	
 	myList = {}
 	try:
-		q1 = 'select amount from scores1 where who1 = %s and product = %s '
-		args = [ user, product ]
+		q1 = 'select amount from score where user_id = %s and product_id = %s '
+		args = [ user_id, product_id ]
 
 		c = readcon( q1, args )
 		row = c.fetchone()
 		if row is not None:
-			amount = row[0]
-			if cr1pr1[0] == user:
+			amount  = row[0]
+			if int( prCrId ) == int( user_id ):
 				available = maxLimit - amount
 				inuse     = amount
 			else:
 				available = amount
 
 		else:
-			if cr1pr1[0] == user:
+			if int( prCrId ) == int( user_id ):
+				available = maxLimit
+				inuse     = 0
+
+		myList[ 'message' ] = 'okay'
+		myList[ 'available' ] = available
+		myList[ 'in use' ]    = inuse
+		
+	except Exception as e:
+		print( 'oo 114; ' +   (str(e)) )
+		return 'error'
+
+	return myList
+
+
+
+'''
+def getBalance( userId, user, prId, prCrId ):  # productCreatorId
+	print ( 'hey', userId, user, prId, prCrId )
+#	cr1pr1 = splitCr1Pr1( product )
+	available = 0
+	inuse     = 0
+	
+	exists = productExists( prId )
+	if exists != 'product is okay':
+		myList = { 'message':exists }
+		return { 'message':exists } #myList
+	
+	myList = {}
+	try:
+		q1 = 'select amount from score where user_id = %s and product_id = %s '
+		args = [ userId, prId ]
+
+		c = readcon( q1, args )
+		row = c.fetchone()
+		if row is not None:
+			amount = row[0]
+			if int(prCrId)  == int(userId):
+				available = maxLimit - amount
+				inuse     = amount
+			else:
+				available = amount
+
+		else:
+			if int(prCrId) == int(userId):
 				available = maxLimit
 				inuse     = 0
 		myList[ 'message' ] = 'okay' # 'product does not exist'
@@ -165,88 +259,143 @@ def getBalance( user, product):
 		return 'error'
 
 	return myList 
+'''
 
-
-def getCanPay( user, product, amount ):
-	var1 = getBalance(user, product) ['available']
+def getCanPay( user_id, product_id, amount ):
+	var1 = getBalance( user_id, product_id ) ['available']
 	if int( var1 ) < int( amount ):
 		return False
 	
 	return True
 
 
-def sendAmount( user, userTo, product, amount, sendSort = 'ordinary' ):
-	print( 'sendAmount         :', user, product, amount, sendSort )
+def prNameToId( pr1 ):
+	q1 = 'SELECT id FROM product where name = %s'
+	c = readcon( q1, [ pr1 ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
+
+
+def prIdToName( pr_id ):
+	q1 = 'SELECT name FROM product where id = %s'
+	c = readcon( q1, [ pr_id ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
+
+'''
+def sendAmount( user, userTo, product, amount, sendSort = 'ordinary', userAvailable = None ):
+	print( 'sendAmount         :', user, product, amount, sendSort, userAvailable )
 
 	if user == userTo:
 		return [ 'logic ok', 'users are the same' ]
 
+	idPr   = prNameToId( product )
 	
-	exists1 = productExists( product )
+	exists1 = productExists( idPr )
 	if exists1 != 'product is okay':
 		return [ 'logic ok', exists1 ]
-
 
 	exists1 = userExists( userTo )
 	if exists1 != True:
 		return [ 'logic ok', exists1 ]
-		
-	
-	var1 = getCanPay( user, product, amount )
 
-	varAvail = getBalance(user, product) ['available']
-	if int( varAvail ) < int( amount ):
-		print( 'cant insufficient funds', int( varAvail ) , int( amount ) )
+	idFrom = userNameToId( user   )
+	idTo   = userNameToId( userTo )
+	prCrId = getPrCrId( idPr )
+	
+	#userBal = getBalance( idFrom, user, idPr, prCrId )
+
+	if userAvailable == None:
+		userBal = getBalance( idFrom, idPr )
+		userAvailable = int( userBal['available'] )
+
+	if int( userAvailable ) < int( amount ):
+		print( 'cant insufficient funds', int( userAvailable ) , int( amount ) )
 		return [ 'logic ok', 'insufficient funds' ]
 
-	varRecer = getBalance(userTo, product) ['available']
+	varRecer = getBalance( idTo, idPr )['available']
 
-	newVarAvail = int( varAvail ) - int( amount )
+	newVarTotal = int( userAvailable ) - int( amount )
 	newVarRecer = int( varRecer ) + int( amount )
 
-	print ( 'canPayaaa:',  newVarAvail,  newVarRecer )
+	print ( 'canPayaaa:',  newVarTotal,  newVarRecer )
 
-	# newVarAvail update / create / delete
 	cr1 = splitCr1Pr1( product )[0]
 	if cr1 == user:
-		newVarAvail = maxLimit - newVarAvail
+		newVarTotal = maxLimit - newVarTotal
 
-	updateScoresRow( newVarAvail, user, product )
+	updateScoresRow( newVarTotal, idFrom, idPr )
 	
 	# newVarRecer update / create / delete
 	cr2 = splitCr1Pr1( product )[0]
 	if cr2 == userTo:
 		newVarRecer = maxLimit - newVarRecer
 	
-	updateScoresRow( newVarRecer, userTo, product )
+	updateScoresRow( newVarRecer, idTo, idPr )
 
 	# add to send rec log 
 	# user userTo, product amount sendsort, dateNow
 
-	addToSendRecLog( user, userTo, product, amount, sendSort )
+	addToSendRecLog( idFrom, idTo, idPr, amount, sendSort )
 
-	print ( 'canPayzzzz:',  newVarAvail,  newVarRecer )
+	print ( 'canPayzzzz:',  newVarTotal,  newVarRecer )
 	
+	return [ 'logic ok', 'amount sent' ]
+'''
+
+
+
+def sendAmount( user1_id, user2_id, product_id, amount, sendSort = 'ordinary', userAvailable = None ):
+	print( 'sendAmountNew ::', user1_id, user2_id, product_id, amount, sendSort, userAvailable )
+	if user1_id == user2_id:
+		return [ 'logic ok', 'users are the same' ]
+	exists1 = productExists( product_id )
+	if exists1 != 'product is okay':
+		return [ 'logic ok', exists1 ]
+	exists1 = userExists_id( user2_id )
+	if exists1 != True:
+		return [ 'logic ok', exists1 ]
+	prCrId = getPrCrId( product_id )
+	if userAvailable == None:
+		userBal = getBalance( user1_id, product_id )
+		userAvailable = int( userBal['available'] )
+	if int( userAvailable ) < int( amount ):
+		print( 'cant insufficient funds', int( userAvailable ) , int( amount ) )
+		return [ 'logic ok', 'insufficient funds' ]
+	varRecer = getBalance( user2_id, product_id )['available']
+	newVarTotal = int( userAvailable ) - int( amount )
+	newVarRecer = int( varRecer ) + int( amount )
+	if prCrId == user1_id:
+		newVarTotal = maxLimit - newVarTotal
+	updateScoresRow( newVarTotal, user1_id, product_id )
+	if prCrId == user2_id:
+		newVarRecer = maxLimit - newVarRecer
+	updateScoresRow( newVarRecer, user2_id, product_id )
+	addToSendRecLog( user1_id, user2_id, product_id, amount, sendSort )
 	return [ 'logic ok', 'amount sent' ]
 
 
-def updateScoresRow( newVar, user, product ):
+def updateScoresRow( newVar, userId, idPr ):
 	if newVar == 0:
 		# sales inTrade maybe ok
-		q1 = 'delete from scores1 where who1 = %s and product = %s'
-		args = [ user, product ]
+		q1 = 'delete from score where user_id = %s and product_id = %s'
+		args = [ userId, idPr ]
 	else:  # newVarAvail > 0
-		q2 = 'select uniqueX from scores1 where who1 = %s and product = %s'
-		args2 = [ user, product ]
+		q2 = 'select id from score where user_id = %s and product_id = %s'
+		args2 = [ userId, idPr ]
 		try:
 			c = readcon( q2, args2 )
 			row = c.fetchone()
 			if row is not None:
-				q1 = 'update scores1 set amount = %s  where who1 = %s and product  = %s'
-				args = [ newVar, user, product ]
+				q1 = 'update score set amount = %s  where user_id = %s and product_id  = %s'
+				args = [ newVar, userId, idPr ]
 			else:
-				q1 = 'insert into scores1 ( who1, product, amount )  values ( %s, %s, %s )'
-				args = [ user, product, newVar ]
+				q1 = 'insert into score ( user_id, product_id, amount )  values ( %s, %s, %s )'
+				args = [ userId, idPr, newVar ]
 		except Exception as e:
 			print( 'oo 223 ; ' +   (str(e)) )
 			return 'error'
@@ -254,34 +403,49 @@ def updateScoresRow( newVar, user, product ):
 	a2q( q1, args )
 
 
-def addToSendRecLog( user, userTo, product, amount, sendSort ):
-	print( 'addToSendRecLog    :', user, userTo, product, amount, sendSort )
+def addToSendRecLog( user, userTo, product_id, amount, sendSort ):
+	print( 'addToSendRecLog    :', user, userTo, product_id, amount, sendSort )
 	dateNow = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-	q1 = 'insert into sendRecLog ( user, userTo, product, amount, sendSort, dateTime )  values ( %s, %s, %s, %s, %s, %s )'
+	q1 = 'insert into sendRecLog ( user1_id, user2_id, product_id, amount, sendSort, dateTime )  values ( %s, %s, %s, %s, %s, %s )'
 
-	args = [ user, userTo, product, amount, sendSort, dateNow ]
+	args = [ user, userTo, product_id, amount, sendSort, dateNow ]
 	a2q( q1, args )
 #	getSendRecLog( '', '', '', '' )
 
 
 def getSendRecLog( startfrom, results, user1, user2, productList ):
 	print ( 'getSendRecLog', startfrom, results, user1, user2, productList )
-	q1 = 'select user, userTo, product, amount, sendSort, dateTime from sendRecLog '
-	q2 = 'select uniqueX from sendRecLog '
 	
+	q1 = '''
+	SELECT u1.name as userFrom, u2.name as userTo, product.name,
+	amount, sendSort, sendRecLog.dateTime
+	FROM sendRecLog 
+	INNER JOIN user u1 ON user1_id = u1.id 
+	INNER JOIN user u2 ON user2_id = u2.id 
+	INNER JOIN product ON product_id = product.id
+	'''
+
+	q2 = '''
+	SELECT sendRecLog.id
+	FROM sendRecLog
+	INNER JOIN user u1 ON user1_id = u1.id 
+	INNER JOIN user u2 ON user2_id = u2.id 
+	INNER JOIN product ON product_id = product.id
+	'''
+
 	print ( productList )
 
 	argExts = []
 	args = []
 
 	if user1 != '':
-		argExts.append( ' ( user = %s or userTo = %s ) ' )
+		argExts.append( ' ( u1.name = %s or  u2.name = %s  ) ' )
 		args.append( user1 )
 		args.append( user1 )
-		
+	'''
 	if user2 != '':
-		argExts.append( ' ( sendSort = "ordinary" and ( ( user = %s and userTo = %s ) or ( userTo = %s and user = %s ) ) ) ' )
+		argExts.append( ' ( sendSort = "ordinary" and ( ( u1.loginName = %s or  u2.loginName = %s  ) or ( u1.loginName = %s or  u2.loginName = %s  ) ) ) ' )
 		args.append( user1 )
 		args.append( user2 )
 		args.append( user2 )
@@ -290,7 +454,8 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 	if len( productList ) > 0:
 		argExts.append( ' ( product in %s ) ' )
 		args.append( productList )
-
+	'''
+	
 	extStr = ' where '
 	count = 0
 
@@ -309,7 +474,9 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 	print ( 'args ', args )
 
 	args2 = list(args)
-	q1 += ' order by dateTime desc, uniqueX desc limit %s, %s '
+
+	q1 += ' order by sendRecLog.dateTime desc, sendRecLog.id desc'
+	q1 += '  limit %s, %s '
 	args.extend( [ int( startfrom ), int(results) ] )
 
 	try:

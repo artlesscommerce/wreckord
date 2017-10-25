@@ -1,4 +1,10 @@
 
+product
+'1', '0', 'mbtc', 'one mbtc', 'okay', '2017-10-25 22:06:26'
+'2', '0', 'euro', 'one euro', 'okay', '2017-10-25 22:06:26'
+
+
+
 products module
 
 optional module
@@ -20,36 +26,36 @@ user can send and receieve products
 
 table structures:
 
-CREATE TABLE `products1` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `productName` varchar(60) NOT NULL,
+CREATE TABLE `product` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(60) NOT NULL,
   `detail` varchar(500) NOT NULL,
   `status1` varchar(25) NOT NULL DEFAULT 'okay',
   `dateTime` datetime NOT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
 
 
-CREATE TABLE `scores1` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `who1` varchar(25) NOT NULL,
-  `product` varchar(40) NOT NULL,
+CREATE TABLE `score` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
   `amount` bigint(10) NOT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE `sendRecLog` (
-  `uniqueX` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(25) NOT NULL,
-  `userTo` varchar(25) NOT NULL,
-  `product` varchar(40) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user1_id` int(11) NOT NULL,
+  `user2_id` int(11) NOT NULL,
+  `product_id` varchar(40) NOT NULL,
   `amount` bigint(10) NOT NULL,
   `sendSort` varchar(25) NOT NULL,
   `dateTime` datetime(3) DEFAULT NULL,
-  PRIMARY KEY (`uniqueX`)
-) ENGINE=MyISAM AUTO_INCREMENT=12031 DEFAULT CHARSET=latin1;
-
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=12051 DEFAULT CHARSET=latin1;
 
 
 # top_one pastepoint 1

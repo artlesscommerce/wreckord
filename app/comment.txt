@@ -1,3 +1,10 @@
+sudo apt-get install python3-venv 
+python3 -m venv env
+./env/bin/pip install flask
+./env/bin/pip install pymysql
+./env/bin/pip install bcrypt
+
+
 
 modular user log in app
 

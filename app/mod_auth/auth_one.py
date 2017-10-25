@@ -9,7 +9,7 @@ from app.mod_utils.utils_one import areBadStrings
 
 from app.mod_utils.dbconnect import connection
 from app.mod_utils.dbconnect import a2q
-# from app.mod_top.top_one import ajaxWrite
+from app.mod_utils.dbconnect import readcon
 
 mod_auth = Blueprint('auth', __name__ ) #url_prefix='/auth'
 
@@ -26,9 +26,11 @@ def signin():
 	if theRes != False:
 		return 'bad pass : ' + str( theRes )
 
-	if checkPassword( username, secretpw ) == True:
+	varCheckPw = checkPassword( username, secretpw )
+	if varCheckPw[0] == True:
 		session['logged_in'] = True
 		session['username'] = username
+		session['user_id'] = varCheckPw[1]
 		thestyle = 'style-dark.css'
 		session['cssStyle'] = url_for('static',filename=thestyle)
 		print ( 'add to signinLog...' + username )
@@ -56,29 +58,32 @@ def checkPassword( username, password1 ):
 	"this returns true of the password and user are good, false otherwise"
 	try:
 		pw1Bytes = password1.encode('utf-8')
-		c, conn = connection()
-		c.execute("SELECT hashword, closeDate FROM users1 WHERE loginName = %s ", (escape_string(username)) )
-#		print (c._last_executed )
+#		c, conn = connection()
+#		c.execute("SELECT hashword, closeDate, id FROM user2 WHERE loginName = %s ", (escape_string(username)) )
+		q1 = 'SELECT hashword, closeDate, id FROM user WHERE name = %s '
+		args = [ username ]
+		c = readcon( q1, args )
+
 		fo = c.fetchone()
 		if fo == None:
-			return  False
+			return [ False, 0 ]
 
 		closedate = fo[1]
 
 		if closedate != None:
-			return False
+			return [ False, 0 ]
 
 		hwBytes = fo[0].encode('utf-8')
 
 		if bcrypt.hashpw( pw1Bytes, hwBytes) == hwBytes:
-			return  True
+			return [ True, fo[2] ]
 
-		return  False
+		return [ False, 0 ]
 	except Exception as e:
 		print ('oo 91 ' + (str(e)) )
-		return False
+		return [ False, 0 ]
 
-	return False
+	return [ False, 0 ]
 
 
 def addUser( username, password1, password2 ):
@@ -87,8 +92,11 @@ def addUser( username, password1, password2 ):
 		return [ 'logic ok', 'passwords do not match' ]
 
 	try:
-		c, conn = connection()
-		c.execute( 'select uniqueX from users1 where loginName = "' + username + '"' )
+#		c, conn = connection()
+#		c.execute( 'select id from user2 where loginName = "' + username + '"' )
+		q1 = 'select id from user where name = %s '
+		args = [ username ]
+		c = readcon( q1, args )
 		row = c.fetchone()
 		if row != None :
 			return [ 'logic ok', 'user name is taken' ]
@@ -96,7 +104,7 @@ def addUser( username, password1, password2 ):
 		pw1Bytes = password1.encode('utf-8')
 		newHash = bcrypt.hashpw( pw1Bytes , bcrypt.gensalt())
 		dateNow = strftime("%Y-%m-%d %H:%M:%S")
-		q1 = 'INSERT INTO users1 ( loginName, hashword, createDate ) VALUES ( %s, %s, %s )'
+		q1 = 'INSERT INTO user ( name, hashword, createDate ) VALUES ( %s, %s, %s )'
 		args = [ username, newHash, dateNow ]
 		a2q( q1, args )
 
@@ -114,10 +122,10 @@ def changePassword( username, oldPass, newPass1, newPass2 ):
 		return [ 'logic ok', 'new passwords don\'t match' ]
 
 	try:
-		if checkPassword( username, oldPass ):
+		if checkPassword( username, oldPass )[ 0 ]:
 #			c, conn = connection()
 			newHash = bcrypt.hashpw( newPass1.encode('utf-8') , bcrypt.gensalt())
-			q1 = "update users1 set hashword = %s where loginName = %s "
+			q1 = "update user set hashword = %s where name = %s "
 			args = [ newHash, username ]
 			a2q( q1, args )
 			return [ 'logic ok', "password changed" ]
@@ -134,8 +142,13 @@ def closeUser( username, pass1 ):
 
 def userExists(username):
 	try:
-		c, conn = connection()
-		c.execute("SELECT closeDate FROM users1 WHERE loginName = %s ", username )
+#		c, conn = connection()
+#		c.execute("SELECT closeDate FROM user2 WHERE loginName = %s ", username )
+
+		q1 = 'SELECT closeDate FROM user WHERE name = %s '
+		args = [ username ]
+		c = readcon( q1, args )
+
 		rowa = c.fetchone()
 		
 		if rowa == None:
@@ -150,12 +163,42 @@ def userExists(username):
 	except Exception as e:
 		return 'oo' + (str(e))
 	return False
-	
+
+
+
+
+def userExists_id( user_id ):
+	try:
+		q1 = 'SELECT closeDate FROM user WHERE id = %s '
+		args = [ user_id ]
+		c = readcon( q1, args )
+
+		rowa = c.fetchone()
+		
+		if rowa == None:
+			return 'no user'
+
+		closedate = rowa[0]
+		if closedate != None:
+			return "user closed!"
+
+		return True
+
+	except Exception as e:
+		return 'oo' + (str(e))
+	return False
+
+
 
 def userCreateDate( username ):
 	try:
-		c, conn = connection()
-		c.execute("SELECT createDate FROM users1 WHERE loginName = %s ", username )
+#		c, conn = connection()
+##		c.execute("SELECT createDate FROM user2 WHERE loginName = %s ", username )
+
+		q1 = 'SELECT createDate FROM user WHERE name = %s  '
+		args = [ username ]
+		c = readcon( q1, args )
+
 		rowa = c.fetchone()
 		
 		if rowa == None:
@@ -188,9 +231,14 @@ def userInfo( username ):
 def listUsers():
 	'return a list of users'
 	try:
-		c, conn = connection()
+#		c, conn = connection()
 #		c.execute( 'SELECT loginName FROM users1', [] )
-		c.execute( 'SELECT loginName FROM users1' )
+#		c.execute( 'SELECT loginName FROM user2' )
+
+		q1 = 'SELECT name FROM user'
+		c = readcon( q1, [] )
+
+
 		myRowCount = c.rowcount
 		myList = []
 		row = c.fetchone()
@@ -205,22 +253,20 @@ def listUsers():
 	return -1
 
 
+def userNameToId( username ):
+	q1 = 'SELECT id FROM user where name = %s'
+	c = readcon( q1, [ username ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
 
-def changeStyle( thestyle ):
-	"this changes a user's css style in user table"
-	try:
-		c, conn = connection()
-		username = session['username']
 
-		q1 = "update users1 set thestyle = %s where loginName = %s "
-		c.execute( q1, ( thestyle, username ) )
-#		addToQueryLog( username, c._last_executed )
-		return  "style changed"
-
-	except Exception as e:
-		print ( 'oo ' + (str(e)) )
-		return  "style not changed"
-
-	return  "password not changed"
-
+def userIdToName( user_id ):
+	q1 = 'SELECT name FROM user where id = %s'
+	c = readcon( q1, [ user_id ] )
+	row = c.fetchone()
+	if row is not None:
+		return row[0]
+	return 0
 
