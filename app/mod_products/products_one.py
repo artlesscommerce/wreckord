@@ -90,6 +90,9 @@ def getProductsOtherList( user_id ):
 			crpr = getPrCrId( row[0] )
 #			crpr = splitCr1Pr1( row[0] )
 			if int( crpr ) != int( user_id ):
+				if int( crpr ) != 0:
+					myList.append( row[0] )
+			row = c.fetchone()
 				myList.append( row[0] )
 			row = c.fetchone()
 
@@ -218,49 +221,6 @@ def getBalance( user_id, product_id, prCrId = None ):
 	return myList
 
 
-
-'''
-def getBalance( userId, user, prId, prCrId ):  # productCreatorId
-	print ( 'hey', userId, user, prId, prCrId )
-#	cr1pr1 = splitCr1Pr1( product )
-	available = 0
-	inuse     = 0
-	
-	exists = productExists( prId )
-	if exists != 'product is okay':
-		myList = { 'message':exists }
-		return { 'message':exists } #myList
-	
-	myList = {}
-	try:
-		q1 = 'select amount from score where user_id = %s and product_id = %s '
-		args = [ userId, prId ]
-
-		c = readcon( q1, args )
-		row = c.fetchone()
-		if row is not None:
-			amount = row[0]
-			if int(prCrId)  == int(userId):
-				available = maxLimit - amount
-				inuse     = amount
-			else:
-				available = amount
-
-		else:
-			if int(prCrId) == int(userId):
-				available = maxLimit
-				inuse     = 0
-		myList[ 'message' ] = 'okay' # 'product does not exist'
-		myList[ 'available' ] = available
-		myList[ 'in use' ]    = inuse
-		
-	except Exception as e:
-		print( 'oo 114; ' +   (str(e)) )
-		return 'error'
-
-	return myList 
-'''
-
 def getCanPay( user_id, product_id, amount ):
 	var1 = getBalance( user_id, product_id ) ['available']
 	if int( var1 ) < int( amount ):
@@ -285,68 +245,6 @@ def prIdToName( pr_id ):
 	if row is not None:
 		return row[0]
 	return 0
-
-'''
-def sendAmount( user, userTo, product, amount, sendSort = 'ordinary', userAvailable = None ):
-	print( 'sendAmount         :', user, product, amount, sendSort, userAvailable )
-
-	if user == userTo:
-		return [ 'logic ok', 'users are the same' ]
-
-	idPr   = prNameToId( product )
-	
-	exists1 = productExists( idPr )
-	if exists1 != 'product is okay':
-		return [ 'logic ok', exists1 ]
-
-	exists1 = userExists( userTo )
-	if exists1 != True:
-		return [ 'logic ok', exists1 ]
-
-	idFrom = userNameToId( user   )
-	idTo   = userNameToId( userTo )
-	prCrId = getPrCrId( idPr )
-	
-	#userBal = getBalance( idFrom, user, idPr, prCrId )
-
-	if userAvailable == None:
-		userBal = getBalance( idFrom, idPr )
-		userAvailable = int( userBal['available'] )
-
-	if int( userAvailable ) < int( amount ):
-		print( 'cant insufficient funds', int( userAvailable ) , int( amount ) )
-		return [ 'logic ok', 'insufficient funds' ]
-
-	varRecer = getBalance( idTo, idPr )['available']
-
-	newVarTotal = int( userAvailable ) - int( amount )
-	newVarRecer = int( varRecer ) + int( amount )
-
-	print ( 'canPayaaa:',  newVarTotal,  newVarRecer )
-
-	cr1 = splitCr1Pr1( product )[0]
-	if cr1 == user:
-		newVarTotal = maxLimit - newVarTotal
-
-	updateScoresRow( newVarTotal, idFrom, idPr )
-	
-	# newVarRecer update / create / delete
-	cr2 = splitCr1Pr1( product )[0]
-	if cr2 == userTo:
-		newVarRecer = maxLimit - newVarRecer
-	
-	updateScoresRow( newVarRecer, idTo, idPr )
-
-	# add to send rec log 
-	# user userTo, product amount sendsort, dateNow
-
-	addToSendRecLog( idFrom, idTo, idPr, amount, sendSort )
-
-	print ( 'canPayzzzz:',  newVarTotal,  newVarRecer )
-	
-	return [ 'logic ok', 'amount sent' ]
-'''
-
 
 
 def sendAmount( user1_id, user2_id, product_id, amount, sendSort = 'ordinary', userAvailable = None ):
@@ -443,18 +341,6 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 		argExts.append( ' ( u1.name = %s or  u2.name = %s  ) ' )
 		args.append( user1 )
 		args.append( user1 )
-	'''
-	if user2 != '':
-		argExts.append( ' ( sendSort = "ordinary" and ( ( u1.loginName = %s or  u2.loginName = %s  ) or ( u1.loginName = %s or  u2.loginName = %s  ) ) ) ' )
-		args.append( user1 )
-		args.append( user2 )
-		args.append( user2 )
-		args.append( user1 )
-		
-	if len( productList ) > 0:
-		argExts.append( ' ( product in %s ) ' )
-		args.append( productList )
-	'''
 	
 	extStr = ' where '
 	count = 0
@@ -514,23 +400,3 @@ def getSendRecLog( startfrom, results, user1, user2, productList ):
 		print( 'oo 223 ; ' +   (str(e)) )
 		return { 'qqqq': 'error'}
 
-
-
-
-'''
-add product 
-productExists
-productInfo
-get list of users own products
-get list of users others products
-get balance
-send product
-
-add to sendreclog
-getsendrec log 0 10 user1 user2 [listofprds]
-
-'''
-
-#productInfo55()
-#print( getProductsOtherList( 'z1' ) )
-#print( getBalanceAll( 'z1' ) )
