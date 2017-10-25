@@ -1,9 +1,15 @@
-sudo apt-get install python3-venv 
+
+sudo apt install python3-venv 
+cd wreckord/
 python3 -m venv env
 ./env/bin/pip install flask
 ./env/bin/pip install pymysql
 ./env/bin/pip install bcrypt
 
+make dbschema
+make user for dbschema with 
+select insert update delete
+privileges
 
 
 modular user log in app
@@ -58,8 +64,3 @@ view send receive log
 
 
 *todo
-
-
-pip3 install Flask
-pip3 install bcrypt
-python3 run.py 
